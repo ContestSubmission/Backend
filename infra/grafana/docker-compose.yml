@@ -1,0 +1,22 @@
+services:
+  grafana:
+    user: ${UID}:${GID}
+    image: grafana/grafana:10.2.1
+    volumes:
+      - ./data:/var/lib/grafana
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./dashboards:/etc/dashboards
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+    ports:
+      - "3000:3000"
+    networks:
+      - contestsubmission
+
+networks:
+  contestsubmission:
+    external: true
