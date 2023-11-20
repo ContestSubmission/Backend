@@ -42,7 +42,7 @@ jobs:
           ./gradlew \
             -Dquarkus.container-image.group="contestsubmission" \
             -Dquarkus.container-image.name="contestsubmission-backend" \
-            -Dquarkus.container-image.tag="'${quarkus.application.version}-${{ github.run_number }}'" \
+            -Dquarkus.container-image.tag='${quarkus.application.version}-${{ github.run_number }}' \
             -Dquarkus.container-image.additional-tags="$additional_tags" \
             -Dquarkus.container-image.labels="$labels" \
             imageBuild
