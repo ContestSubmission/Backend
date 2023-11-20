@@ -11,7 +11,6 @@ jobs:
         with:
           java-version: 21
           distribution: temurin
-          cache: gradle
 
       - name: Docker Metadata
         id: docker-metadata
@@ -20,19 +19,22 @@ jobs:
           # won't be used but is required by the action
           images: ghcr.io/contestsubmission/contestsubmission-backend
           tags: |
-            type=raw,{{ github.run_number }}-{{ github.run_id }}
+            type=raw,${{ github.run_number }}-${{ github.run_id }}
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern=v{{major}}
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{version}}
 
+      - name: Setup gradle
+        uses: gradle/gradle-build-action@v2
+
       - name: Build docker image
         run: |
           ./gradlew \
             -Dquarkus.container-image.group="contestsubmission" \
             -Dquarkus.container-image.name="contestsubmission-backend" \
-            -Dquarkus.container-image.additional-tags="$DOCKER_METADATA_OUTPUT_TAGS" \
+            -Dquarkus.container-image.additional-tags="$(echo "$DOCKER_METADATA_OUTPUT_TAGS" | tr ' ' ',')" \
             imageBuild
 
       - name: Log in to GHCR
