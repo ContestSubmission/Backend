@@ -30,7 +30,6 @@ jobs:
           labels: |
             com.github.actions.run.id=${{ github.run_id }}
             com.github.actions.run.number=${{ github.run_number }}
-            com.github.actions.run.url=${{ github.run_url }}
 
       - name: Setup gradle
         uses: gradle/gradle-build-action@v2
@@ -38,14 +37,22 @@ jobs:
       - name: Build docker image
         run: |
           additional_tags="$(echo "$DOCKER_METADATA_OUTPUT_TAGS" | tr '\n' ',' | sed 's/dummy://g')"
-          labels="$(echo "$DOCKER_METADATA_OUTPUT_LABELS" | awk -F '=' '{print "quarkus.container-image.labels.\"" $1 "\"="$2}')"
+          # i hate bash for these things
+          labels=$(echo "$DOCKER_METADATA_OUTPUT_LABELS" | awk -F '=' '{print "-Dquarkus.container-image.labels.\"" $1 "\"=" $2 ""}')
+
+          SAVEIFS=$IFS   # Save current IFS (Internal Field Separator)
+          IFS=$'\n'      # Change IFS to newline char
+          labels=($labels) # split the `names` string into an array by the same name
+          IFS=$SAVEIFS   # Restore original IFS
+
           ./gradlew \
             -Dquarkus.container-image.group="contestsubmission" \
             -Dquarkus.container-image.name="contestsubmission-backend" \
             -Dquarkus.container-image.tag='${quarkus.application.version}-${{ github.run_number }}' \
             -Dquarkus.container-image.additional-tags="$additional_tags" \
-            -Dquarkus.container-image.labels="$labels" \
-            imageBuild
+            "${labels[@]}" \
+            quarkusDev
+
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
