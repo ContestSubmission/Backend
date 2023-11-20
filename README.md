@@ -10,6 +10,15 @@ You can run your application in dev mode that enables live coding using:
 ```
 To view information about the application, access the DevUI at http://localhost:8080/q/dev/.
 
+## Configuration
+Since quarkus is quite shitty when it comes to configuration files, we have to use either environment variables or
+a .yml file. For development, the latter is recommended.
+
+Create the `src/main/resources/application.yml` file and configure away! Check the
+[config-yaml](https://quarkus.io/guides/config-yaml) extension for more information. Both the `application.yml` file
+and the profile-specific ones are gitignored, so you can safely add your own configuration without worrying about
+accidentally committing it.
+
 ## Packaging and running the application
 
 The application can be packaged using:

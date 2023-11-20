@@ -73,3 +73,6 @@ gradle-app.setting
 
 
 !**.gitkeep
+
+# IMPORTANT: use `application[-<profile>].yml` to configure per-machine properties
+**application*.yml
