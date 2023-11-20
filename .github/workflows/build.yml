@@ -27,17 +27,24 @@ jobs:
             type=semver,pattern=v{{version}}
             type=ref,event=branch
             type=ref,event=pr
+          labels: |
+            com.github.actions.run.id=${{ github.run_id }}
+            com.github.actions.run.number=${{ github.run_number }}
+            com.github.actions.run.url=${{ github.run_url }}
 
       - name: Setup gradle
         uses: gradle/gradle-build-action@v2
 
       - name: Build docker image
         run: |
+          additional_tags="$(echo "$DOCKER_METADATA_OUTPUT_TAGS" | tr '\n' ',' | sed 's/dummy://g')"
+          labels="$(echo "$DOCKER_METADATA_OUTPUT_LABELS" | awk -F '=' '{print "quarkus.container-image.labels.\"" $1 "\"="$2}')"
           ./gradlew \
             -Dquarkus.container-image.group="contestsubmission" \
             -Dquarkus.container-image.name="contestsubmission-backend" \
-            -Dquarkus.container-image.tag='${quarkus.application.version}+${{ github.run_number }}.${{ github.run_id }}' \
-            -Dquarkus.container-image.additional-tags="$(echo "$DOCKER_METADATA_OUTPUT_TAGS" | tr '\n' ',' | sed 's/dummy://g')" \
+            -Dquarkus.container-image.tag="'${quarkus.application.version}-${{ github.run_number }}'" \
+            -Dquarkus.container-image.additional-tags="$additional_tags" \
+            -Dquarkus.container-image.labels="$labels" \
             imageBuild
 
       - name: Log in to GHCR
