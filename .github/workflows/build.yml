@@ -17,6 +17,8 @@ jobs:
         id: docker-metadata
         uses: docker/metadata-action@v5
         with:
+          # won't be used but is required by the action
+          images: ghcr.io/contestsubmission/contestsubmission-backend
           tags: |
             type=raw,{{ github.run_number }}-{{ github.run_id }}
             type=ref,event=branch
