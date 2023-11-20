@@ -51,7 +51,7 @@ jobs:
             -Dquarkus.container-image.tag='${quarkus.application.version}-${{ github.run_number }}' \
             -Dquarkus.container-image.additional-tags="$additional_tags" \
             "${labels[@]}" \
-            quarkusDev
+            imageBuild
 
 
       - name: Log in to GHCR
