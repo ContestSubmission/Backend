@@ -22,12 +22,11 @@ jobs:
           # won't be used but is required by the action
           images: dummy
           tags: |
-            type=raw,b${{ github.run_number }}-gha${{ github.run_id }}
-            type=ref,event=branch
-            type=ref,event=pr
             type=semver,pattern=v{{major}}
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{version}}
+            type=ref,event=branch
+            type=ref,event=pr
 
       - name: Setup gradle
         uses: gradle/gradle-build-action@v2
@@ -37,6 +36,7 @@ jobs:
           ./gradlew \
             -Dquarkus.container-image.group="contestsubmission" \
             -Dquarkus.container-image.name="contestsubmission-backend" \
+            -Dquarkus.container-image.tag="b${{ github.run_number }}-gha${{ github.run_id }}" \
             -Dquarkus.container-image.additional-tags="$(echo "$DOCKER_METADATA_OUTPUT_TAGS" | tr '\n' ',' | sed 's/dummy://g')" \
             imageBuild
 
