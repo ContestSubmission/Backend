@@ -19,7 +19,7 @@ jobs:
           # won't be used but is required by the action
           images: ghcr.io/contestsubmission/contestsubmission-backend
           tags: |
-            type=raw,${{ github.run_number }}-${{ github.run_id }}
+            type=raw,b${{ github.run_number }}-gha${{ github.run_id }}
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern=v{{major}}
@@ -34,7 +34,7 @@ jobs:
           ./gradlew \
             -Dquarkus.container-image.group="contestsubmission" \
             -Dquarkus.container-image.name="contestsubmission-backend" \
-            -Dquarkus.container-image.additional-tags="$(echo "$DOCKER_METADATA_OUTPUT_TAGS" | tr ' ' ',')" \
+            -Dquarkus.container-image.additional-tags="$(echo "$DOCKER_METADATA_OUTPUT_TAGS" | tr '\n' ',')" \
             imageBuild
 
       - name: Log in to GHCR
