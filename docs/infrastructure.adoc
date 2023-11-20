@@ -26,12 +26,14 @@ which is based on the link:https://docs.aws.amazon.com/sdk-for-java/v2/developer
 is used.
 
 While this might seem like a vendor lock-in, it _shouldn't_ be one.
-That is because S3 is a de-facto standard for object storage. Plenty of other services, like GCP's Cloud Storage or
-Oracle's Object Storage are compatible with S3. Not only that, for local deployments, MinIO can be used as a drop-in
-replacement for proprietary cloud services.
+That is because link:https://en.wikipedia.org/wiki/Amazon_S3[S3] is a de-facto standard for object storage. Plenty of
+other services, like link:https://en.wikipedia.org/wiki/Google_Cloud_Storage[GCP's Cloud Storage] or
+link:https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/s3compatibleapi.htm[Oracle's Object Storage]
+are compatible with S3. Not only that, for managed deployments, the open source link:https://min.io/[MinIO]
+can be used as a drop-in replacement for proprietary cloud services.
 
-In development, quarkus automatically launches a re-implementation of S3, powered by
-link:https://docs.localstack.cloud/user-guide/aws/s3/[localstack].
+In development, quarkus automatically launches a link:https://docs.localstack.cloud/user-guide/aws/s3/[re-implementation of S3], powered by
+link:https://localstack.cloud[LocalStack].
 
 == Monitoring
 Monitoring is Jakob's favorite topic, therefore, a lot of effort has gone into making sure that ContestSubmission is
