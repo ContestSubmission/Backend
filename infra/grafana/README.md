@@ -4,7 +4,7 @@ The grafana instance is automatically provisioned. It can be reached under [loca
 Authentication is disabled, no login is required, and you are automatically an admin.
 
 Keep in mind that this is a development instance, and should not be used in production.<br>
-There, either use a properly set up Grafana instance or an industry-grade solution like [Dynatrace](https://www.dynatrace.com/).
+There, either use a properly set up Grafana instance or a industry-grade solution like [Dynatrace](https://www.dynatrace.com/).
 
 
 ### Provisioned Resources
