@@ -30,7 +30,7 @@ That is because S3 is a de-facto standard for object storage. Plenty of other se
 Oracle's Object Storage are compatible with S3. Not only that, for local deployments, MinIO can be used as a drop-in
 replacement for proprietary cloud services.
 
-In development, quarkus handles launching the bucket using
+In development, quarkus automatically launches a re-implementation of S3, powered by
 link:https://docs.localstack.cloud/user-guide/aws/s3/[localstack].
 
 == Monitoring
