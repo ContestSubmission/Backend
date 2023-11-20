@@ -17,7 +17,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           # won't be used but is required by the action
-          images: ghcr.io/contestsubmission/contestsubmission-backend
+          images: dummy
           tags: |
             type=raw,b${{ github.run_number }}-gha${{ github.run_id }}
             type=ref,event=branch
@@ -34,7 +34,7 @@ jobs:
           ./gradlew \
             -Dquarkus.container-image.group="contestsubmission" \
             -Dquarkus.container-image.name="contestsubmission-backend" \
-            -Dquarkus.container-image.additional-tags="$(echo "$DOCKER_METADATA_OUTPUT_TAGS" | tr '\n' ',')" \
+            -Dquarkus.container-image.additional-tags="$(echo "$DOCKER_METADATA_OUTPUT_TAGS" | tr '\n' ',' | sed 's/dummy://g')" \
             imageBuild
 
       - name: Log in to GHCR
