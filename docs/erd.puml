@@ -1,0 +1,51 @@
+@startuml
+header
+Entities have UUIDs as IDs unless noted otherwise
+endheader
+
+entity Team {
+	contest: Contest
+	submission: Submission
+	name: String
+}
+
+entity TeamMember {
+	team: Team
+	user: User
+}
+
+entity User {
+	<auth references>
+}
+
+Team "*" -- "*" User
+(Team, User) .. TeamMember
+
+entity Contest {
+	name: String
+	organizer: User
+	description: String?
+	deadline: LocalDateTime
+	maxTeamSize: Int
+}
+
+Team "*" -- "1" Contest
+
+entity ContestSubmissionRestriction {
+	contest: Contest
+	restrictionType: String // Class<? : Restriction>
+	data: Restriction // JSON
+}
+
+Contest "1" -- "*" ContestSubmissionRestriction
+
+entity Submission {
+	team: Team
+	submittingUser: User
+}
+
+Team "1" -- "0..1     " Submission
+
+
+
+@enduml
