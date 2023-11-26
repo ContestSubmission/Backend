@@ -4,18 +4,14 @@ import com.github.contestsubmission.backend.feature.user.UserAuthenticationServi
 import com.github.contestsubmission.backend.util.db.findByIdFullFetch
 import com.github.contestsubmission.backend.util.rest.UriBuildable
 import com.github.contestsubmission.backend.util.rest.response
+import io.quarkus.security.Authenticated
 import jakarta.inject.Inject
 import jakarta.validation.Valid
-import jakarta.ws.rs.Consumes
-import jakarta.ws.rs.GET
-import jakarta.ws.rs.POST
-import jakarta.ws.rs.Path
-import jakarta.ws.rs.Produces
+import jakarta.ws.rs.*
 import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.core.UriInfo
-import org.jboss.resteasy.reactive.RestHeader
 import java.util.*
 
 @Path("/contest")
@@ -33,8 +29,9 @@ class ContestResource : UriBuildable {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	open suspend fun createContest(@RestHeader("Caller-ID") callerId: UUID, @Valid contest: Contest): Response {
-		val caller = userAuthenticationService.getUserByCallerId(callerId) ?: return Response.status(Response.Status.UNAUTHORIZED).build()
+	@Authenticated
+	open suspend fun createContest(@Valid contest: Contest): Response {
+		val caller = userAuthenticationService.getUser() ?: return Response.status(Response.Status.UNAUTHORIZED).build()
 
 		contest.organizer = caller
 		contest.id = null

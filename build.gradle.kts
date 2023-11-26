@@ -23,6 +23,7 @@ dependencies {
 	implementation("io.quarkus:quarkus-resteasy-reactive")
 	implementation("io.quarkus:quarkus-resteasy-reactive-kotlin")
 	implementation("io.quarkus:quarkus-resteasy-reactive-jackson")
+	implementation("io.quarkus:quarkus-oidc")
 	implementation("io.quarkus:quarkus-flyway")
 	implementation("io.quarkus:quarkus-smallrye-openapi")
 	implementation("io.quarkus:quarkus-kotlin")
@@ -67,6 +68,7 @@ tasks.withType<Test> {
 allOpen {
 	annotation("jakarta.ws.rs.Path")
 	annotation("jakarta.enterprise.context.ApplicationScoped")
+	annotation("jakarta.enterprise.context.RequestScoped")
 	annotation("jakarta.persistence.Entity")
 	annotation("io.quarkus.test.junit.QuarkusTest")
 }

@@ -1,10 +1,13 @@
 package com.github.contestsubmission.backend.feature.user
 
-import jakarta.enterprise.context.ApplicationScoped
+import com.github.contestsubmission.backend.util.toUUID
+import io.quarkus.oidc.IdToken
+import jakarta.enterprise.context.RequestScoped
 import jakarta.inject.Inject
-import java.util.UUID
+import org.eclipse.microprofile.jwt.JsonWebToken
+import java.util.*
 
-@ApplicationScoped
+@RequestScoped
 class UserAuthenticationService {
 	@Inject
 	lateinit var userRepository: PersonRepository
@@ -12,5 +15,18 @@ class UserAuthenticationService {
 	// will be replaced by OIDC later - see https://github.com/ContestSubmission/Backend/issues/4
 	open suspend fun getUserByCallerId(callerId: UUID): Person? {
 		return userRepository.findById(callerId)
+	}
+
+	@Inject
+	@IdToken
+	lateinit var jwt: JsonWebToken
+
+	open suspend fun getUser(): Person? = getUserByCallerId(getUUID())
+
+	fun getUUID() = jwt.claim<String>("sub").orElseThrow { IllegalStateException("JWT does not contain an id") }
+		.toUUID() ?: throw IllegalStateException("id is not a valid UUID")
+
+	open suspend fun createUser(person: Person): Person {
+		return userRepository.persist(person)
 	}
 }

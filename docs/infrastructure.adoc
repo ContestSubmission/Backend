@@ -59,3 +59,34 @@ In staging / prod, a industry-grade monitoring solution is used: link:https://dy
 Dynatrace can automatically monitor not only the application but also the underlying infrastructure.
 This is crucial since the application was built for maximum performance and scalability, therefore requiring
 deep insights in order to be able to optimize it.
+
+== Authentication
+Authentication is handled by an OIDC provider. In this case, link:https://casdoor.org/[Casdoor] is used.
+
+Casdoor is a lightweight, open source, OIDC provider. It is easy to deploy and configure.
+
+Contrary to the other services, Casdoor is not deployed using docker-compose, but rather using kubernetes.
+The configs are located in a separate repository and are deployed using ArgoCD. In development, the configs can be
+re-used with only some minor changes. +
+The configs are located under link:https://github.com/ContestSubmission/GitOps/tree/main/casdoor[`infra/casdoor`] in the link:https://github.com/ContestSubmission/GitOps[GitOps repo]. +
+
+=== Launching
+To launch the stack, run the following command in the `infra/casdoor` directory:
+[source,bash]
+----
+kubectl apply -k overlays/dev
+----
+
+(Production will get its own overlay in the future. This is also what will be deployed using ArgoCD.)
+
+=== Configuring Quarkus
+Don't forget to set these properties:
+[source,properties]
+----
+# WARNING: IP may be different for minikube!
+quarkus.oidc.auth-server-url=http://localhost:30100
+# found in the casdoor config
+quarkus.oidc.client-id=myclientid
+# found in the casdoor config
+quarkus.oidc.credentials.secret=myclientsecret
+----

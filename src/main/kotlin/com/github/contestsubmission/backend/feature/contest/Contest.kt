@@ -30,7 +30,7 @@ class Contest(
 ) : LazyFetchable {
 	constructor() : this(
 		name = "",
-		organizer = Person(name = ""),
+		organizer = Person(),
 		deadline = LocalDateTime.now(),
 		maxTeamSize = 1
 	)
