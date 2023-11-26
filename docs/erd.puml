@@ -11,19 +11,19 @@ entity Team {
 
 entity TeamMember {
 	team: Team
-	user: User
+	person: Person
 }
 
-entity User {
+entity Person {
 	<auth references>
 }
 
-Team "*" -- "*" User
-(Team, User) .. TeamMember
+Team "*" -- "*" Person
+(Team, Person) .. TeamMember
 
 entity Contest {
 	name: String
-	organizer: User
+	organizer: Person
 	description: String?
 	deadline: LocalDateTime
 	maxTeamSize: Int
@@ -41,11 +41,9 @@ Contest "1" -- "*" ContestSubmissionRestriction
 
 entity Submission {
 	team: Team
-	submittingUser: User
+	submittingPerson: Person
 }
 
 Team "1" -- "0..1     " Submission
-
-
 
 @enduml

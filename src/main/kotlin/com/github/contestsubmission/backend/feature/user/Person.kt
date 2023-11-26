@@ -1,15 +1,15 @@
-package com.github.contestsubmission.backend.entity
+package com.github.contestsubmission.backend.feature.user
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import java.util.UUID
 
 @Entity
-class MyTestEntity {
+class Person(
+	@GeneratedValue(strategy = GenerationType.UUID)
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	var id: Long? = null
-
+	var id: UUID? = null,
 	val name: String? = null
-}
+)

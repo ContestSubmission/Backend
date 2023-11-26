@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 	kotlin("jvm") version "1.9.20"
 	kotlin("plugin.allopen") version "1.9.20"
+	kotlin("plugin.jpa") version "1.9.20"
 	id("io.quarkus")
 }
 
@@ -20,8 +21,8 @@ dependencies {
 	implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
 	implementation(enforcedPlatform("${quarkusPlatformGroupId}:quarkus-amazon-services-bom:${quarkusPlatformVersion}"))
 	implementation("io.quarkus:quarkus-resteasy-reactive")
+	implementation("io.quarkus:quarkus-resteasy-reactive-kotlin")
 	implementation("io.quarkus:quarkus-resteasy-reactive-jackson")
-	implementation("io.quarkus:quarkus-resteasy-reactive-kotlin-serialization")
 	implementation("io.quarkus:quarkus-flyway")
 	implementation("io.quarkus:quarkus-smallrye-openapi")
 	implementation("io.quarkus:quarkus-kotlin")
@@ -29,6 +30,7 @@ dependencies {
 	implementation("io.quarkus:quarkus-opentelemetry")
 	implementation("io.quarkus:quarkus-scheduler")
 	implementation("io.quarkus:quarkus-hibernate-reactive-panache-kotlin")
+	implementation("io.quarkus:quarkus-hibernate-validator")
 	implementation("io.quarkiverse.amazonservices:quarkus-amazon-s3")
 	implementation("io.quarkus:quarkus-reactive-pg-client")
 	implementation("io.quarkus:quarkus-container-image-jib")
