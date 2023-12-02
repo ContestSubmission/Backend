@@ -1,7 +1,6 @@
 package com.github.contestsubmission.backend.feature.user
 
 import com.github.contestsubmission.backend.util.toUUID
-import io.quarkus.oidc.IdToken
 import jakarta.enterprise.context.RequestScoped
 import jakarta.inject.Inject
 import org.eclipse.microprofile.jwt.JsonWebToken
@@ -18,7 +17,6 @@ class UserAuthenticationService {
 	}
 
 	@Inject
-	@IdToken
 	lateinit var jwt: JsonWebToken
 
 	open suspend fun getUser(): Person? = getUserByCallerId(getUUID())
