@@ -42,6 +42,8 @@ dependencies {
 	implementation("io.quarkus:quarkus-config-yaml")
 	testImplementation("io.quarkus:quarkus-junit5")
 	testImplementation("io.rest-assured:rest-assured")
+
+	quarkusDev("org.jetbrains.kotlin:kotlin-allopen-compiler-plugin")
 }
 
 group = "com.github.contestsubmission.backend"
@@ -64,11 +66,24 @@ kotlin {
 tasks.withType<Test> {
 	systemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager")
 }
+val allOpenAnnotationArguments = listOf(
+	"jakarta.ws.rs.Path",
+	"jakarta.enterprise.context.ApplicationScoped",
+	"jakarta.enterprise.context.RequestScoped",
+	"jakarta.persistence.Entity",
+	"io.quarkus.test.junit.QuarkusTest"
+)
 
 allOpen {
-	annotation("jakarta.ws.rs.Path")
-	annotation("jakarta.enterprise.context.ApplicationScoped")
-	annotation("jakarta.enterprise.context.RequestScoped")
-	annotation("jakarta.persistence.Entity")
-	annotation("io.quarkus.test.junit.QuarkusTest")
+	annotations(allOpenAnnotationArguments)
+}
+
+tasks.quarkusDev {
+	compilerOptions {
+		compiler("kotlin").args(
+			mutableListOf(
+				"-Xplugin=${configurations.quarkusDev.get().files.find { "kotlin-allopen-compiler-plugin" in it.name }}"
+			) + allOpenAnnotationArguments.map { "-P=plugin:org.jetbrains.kotlin.allopen:annotation=$it" }
+		)
+	}
 }
