@@ -53,7 +53,7 @@ jobs:
             "${labels[@]}" \
             imageBuild
 
-          echo "application_version=$(./gradlew properties -q | awk '/^version:/ {print $2}')-${{ github.run_number }}" \
+          echo "application_version=$(./gradlew properties -q | awk '/^version:/ {print $2}')" \
             >> "$GITHUB_OUTPUT"
 
       - name: Log in to GHCR
