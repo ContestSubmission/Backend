@@ -8,11 +8,14 @@ import com.github.contestsubmission.backend.util.rest.response
 import io.quarkus.security.Authenticated
 import jakarta.inject.Inject
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.core.UriInfo
+import kotlinx.coroutines.delay
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
@@ -53,4 +56,14 @@ class ContestResource : UriBuildable {
 		)]
 	)
 	open suspend fun getContest(@Valid id: UUID) = contestRepository.findByIdFullFetch(id).response()
+
+	@GET
+	@Path("/search")
+	@Produces(MediaType.APPLICATION_JSON)
+	@APIResponse(
+		responseCode = "200", description = "Contests found (or not)", content = [Content(
+			mediaType = MediaType.APPLICATION_JSON, schema = Schema(implementation = Contest::class, type = SchemaType.ARRAY)
+		)]
+	)
+	open suspend fun listContests(@QueryParam("term") term: String): Response = contestRepository.search(term).response()
 }
