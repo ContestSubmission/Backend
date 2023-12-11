@@ -84,7 +84,7 @@ jobs:
           name: openapi-spec
 
       - name: Run OpenAPI generator
-        uses: openapi-generators/openapitools-generator-action@v1.5
+        uses: openapi-generators/openapitools-generator-action@v1
         with:
           generatorName: typescript-fetch
           generator-tag: v7.1.0
