@@ -103,7 +103,7 @@ jobs:
           cat <<EOF > package.json
           {
             "name": "@contestsubmission/api-client",
-            "version": "${{ needs.build.outputs.application_version }}",
+            "version": "${{ needs.build.outputs.application_version }}-SNAPSHOT.${{ github.run_number }}",
             "repository": {
               "type": "git",
               "url": "git+https://github.com/ContestSubmission/Backend.git"
