@@ -37,7 +37,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Build docker image
-        id: : build-docker-image
+        id: build-docker-image
         run: |
           additional_tags="$(echo "$DOCKER_METADATA_OUTPUT_TAGS" | tr '\n' ',' | sed 's/dummy://g')"
           # i hate bash for these things
