@@ -6,6 +6,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      application_version: ${{ steps.build-docker-image.outputs.application_version }}
     steps:
       - uses: actions/checkout@v4
 
@@ -35,6 +37,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Build docker image
+        id: : build-docker-image
         run: |
           additional_tags="$(echo "$DOCKER_METADATA_OUTPUT_TAGS" | tr '\n' ',' | sed 's/dummy://g')"
           # i hate bash for these things
