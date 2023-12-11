@@ -4,7 +4,11 @@ import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.core.Response.ResponseBuilder
 import jakarta.ws.rs.core.UriInfo
 
-fun <T> T.response(): Response = Response.ok(this).build()
+fun <T> T?.response(): Response =
+	when {
+		this != null -> Response.ok(this).build()
+		else -> Response.status(Response.Status.NOT_FOUND).build()
+	}
 
 fun <T> T.response(builder: ResponseBuilder.() -> Unit): Response = Response.ok(this).apply(builder).build()
 

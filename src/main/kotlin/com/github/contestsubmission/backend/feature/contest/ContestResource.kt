@@ -13,11 +13,13 @@ import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.core.UriInfo
+import org.eclipse.microprofile.openapi.annotations.media.Content
+import org.eclipse.microprofile.openapi.annotations.media.Schema
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import java.util.*
 
 @Path("/contest")
 class ContestResource : UriBuildable {
-
 	@Inject
 	lateinit var contestRepository: ContestRepository
 
@@ -33,7 +35,6 @@ class ContestResource : UriBuildable {
 	@Authenticated
 	open suspend fun createContest(@Valid contestCreateDTO: ContestCreateDTO): Response {
 		val caller = userAuthenticationService.getUser() ?: return Response.status(Response.Status.UNAUTHORIZED).build()
-
 		val contest = contestCreateDTO.toEntity()
 		contest.organizer = caller
 
@@ -45,7 +46,11 @@ class ContestResource : UriBuildable {
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	open suspend fun getContest(@Valid id: UUID): Response {
-		return contestRepository.findByIdFullFetch(id)?.response() ?: Response.status(Response.Status.NOT_FOUND).build()
-	}
+	@APIResponse(responseCode = "404", description = "Contest not found")
+	@APIResponse(
+		responseCode = "200", description = "Contest found", content = [Content(
+			mediaType = MediaType.APPLICATION_JSON, schema = Schema(implementation = Contest::class)
+		)]
+	)
+	open suspend fun getContest(@Valid id: UUID) = contestRepository.findByIdFullFetch(id).response()
 }
