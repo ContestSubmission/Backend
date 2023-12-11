@@ -1,5 +1,6 @@
 package com.github.contestsubmission.backend.feature.contest
 
+import com.github.contestsubmission.backend.feature.contest.dto.ContestCreateDTO
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
 import com.github.contestsubmission.backend.util.db.findByIdFullFetch
 import com.github.contestsubmission.backend.util.rest.UriBuildable
@@ -30,11 +31,12 @@ class ContestResource : UriBuildable {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Authenticated
-	open suspend fun createContest(@Valid contest: Contest): Response {
+	open suspend fun createContest(@Valid contestCreateDTO: ContestCreateDTO): Response {
 		val caller = userAuthenticationService.getUser() ?: return Response.status(Response.Status.UNAUTHORIZED).build()
 
+		val contest = contestCreateDTO.toEntity()
 		contest.organizer = caller
-		contest.id = null
+
 		return contestRepository.persist(contest).response {
 			header("Location", contest.id.toUri())
 		}
