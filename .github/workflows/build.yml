@@ -67,7 +67,7 @@ jobs:
         run: docker push --all-tags ghcr.io/contestsubmission/contestsubmission-backend
 
       - name: Upload OpenAPI spec
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: openapi-spec
           path: build/openapi
@@ -79,14 +79,14 @@ jobs:
       id-token: write
     needs: build
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: openapi-spec
 
       - name: Run OpenAPI generator
         uses: openapi-generators/openapitools-generator-action@v1
         with:
-          generatorName: typescript-fetch
+          generator: typescript-fetch
           generator-tag: v7.1.0
 
       - uses: actions/setup-node@v3
