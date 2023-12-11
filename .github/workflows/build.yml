@@ -117,6 +117,9 @@ jobs:
           EOF
 
       - name: Publish client to npm
-        run: npm publish --provenance
+        run: |
+          shopt -s dotglob
+          mv typescript-fetch-client/* .
+          npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
