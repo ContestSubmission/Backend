@@ -38,6 +38,8 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("io.quarkus:quarkus-arc")
 	implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
+	implementation("io.quarkus:quarkus-kubernetes")
+	implementation("io.quarkus:quarkus-kubernetes-config")
 	// required because quarkus is too stupid to use multiple .properties files
 	implementation("io.quarkus:quarkus-config-yaml")
 	testImplementation("io.quarkus:quarkus-junit5")
