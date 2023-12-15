@@ -88,4 +88,6 @@ tasks.quarkusDev {
 			) + allOpenAnnotationArguments.map { "-P=plugin:org.jetbrains.kotlin.allopen:annotation=$it" }
 		)
 	}
+	// "disable" k8s connection as quarkus can't be bothered to respect the config value
+	environmentVariables.put("KUBERNETES_AUTH_TRYKUBECONFIG", "false")
 }
