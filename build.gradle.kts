@@ -25,6 +25,8 @@ dependencies {
 	implementation("io.quarkus:quarkus-resteasy-reactive-jackson")
 	implementation("io.quarkus:quarkus-oidc")
 	implementation("io.quarkus:quarkus-flyway")
+	// required for flyway... ffs
+	implementation("io.quarkus:quarkus-jdbc-postgresql")
 	implementation("io.quarkus:quarkus-smallrye-openapi")
 	implementation("io.quarkus:quarkus-kotlin")
 	implementation("io.quarkus:quarkus-jacoco")
