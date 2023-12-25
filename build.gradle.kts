@@ -25,6 +25,8 @@ dependencies {
 	implementation("io.quarkus:quarkus-resteasy-reactive-jackson")
 	implementation("io.quarkus:quarkus-oidc")
 	implementation("io.quarkus:quarkus-flyway")
+	// required for flyway... ffs
+	implementation("io.quarkus:quarkus-jdbc-postgresql")
 	implementation("io.quarkus:quarkus-smallrye-openapi")
 	implementation("io.quarkus:quarkus-kotlin")
 	implementation("io.quarkus:quarkus-jacoco")
@@ -38,6 +40,8 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("io.quarkus:quarkus-arc")
 	implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
+	implementation("io.quarkus:quarkus-kubernetes")
+	implementation("io.quarkus:quarkus-kubernetes-config")
 	// required because quarkus is too stupid to use multiple .properties files
 	implementation("io.quarkus:quarkus-config-yaml")
 	testImplementation("io.quarkus:quarkus-junit5")
@@ -78,6 +82,12 @@ allOpen {
 	annotations(allOpenAnnotationArguments)
 }
 
+val disabledKubeConfig = Pair("KUBERNETES_AUTH_TRYKUBECONFIG", "false")
+
+tasks.test {
+	setEnvironment(disabledKubeConfig)
+}
+
 tasks.quarkusDev {
 	compilerOptions {
 		compiler("kotlin").args(
@@ -86,4 +96,11 @@ tasks.quarkusDev {
 			) + allOpenAnnotationArguments.map { "-P=plugin:org.jetbrains.kotlin.allopen:annotation=$it" }
 		)
 	}
+	// "disable" k8s connection as quarkus can't be bothered to respect the config value
+	environmentVariables.put(disabledKubeConfig)
+}
+
+fun <K, V> MapProperty<K, V>.put(pair: Pair<K, V>): MapProperty<K, V> {
+	this.put(pair.first, pair.second)
+	return this
 }
