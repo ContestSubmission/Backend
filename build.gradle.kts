@@ -82,6 +82,12 @@ allOpen {
 	annotations(allOpenAnnotationArguments)
 }
 
+val disabledKubeConfig = Pair("KUBERNETES_AUTH_TRYKUBECONFIG", "false")
+
+tasks.test {
+	setEnvironment(disabledKubeConfig)
+}
+
 tasks.quarkusDev {
 	compilerOptions {
 		compiler("kotlin").args(
@@ -91,5 +97,10 @@ tasks.quarkusDev {
 		)
 	}
 	// "disable" k8s connection as quarkus can't be bothered to respect the config value
-	environmentVariables.put("KUBERNETES_AUTH_TRYKUBECONFIG", "false")
+	environmentVariables.put(disabledKubeConfig)
+}
+
+fun <K, V> MapProperty<K, V>.put(pair: Pair<K, V>): MapProperty<K, V> {
+	this.put(pair.first, pair.second)
+	return this
 }
