@@ -10,7 +10,7 @@ class ContestRepository : CRUDRepository<Contest, UUID>() {
 	override val entityClass: Class<Contest> = Contest::class.java
 
 	suspend fun search(term: String): MutableList<Contest>? = sessionFactory.transaction {
-		it.createQuery("""
+		createQuery("""
 			SELECT c FROM Contest c WHERE
 				(lower(c.name) LIKE lower(:term) OR lower(c.description) LIKE lower(:term))
 				AND c.public

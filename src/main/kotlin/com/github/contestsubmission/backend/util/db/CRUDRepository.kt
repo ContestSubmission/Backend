@@ -13,14 +13,9 @@ abstract class CRUDRepository<T, I> {
 
 	abstract val entityClass: Class<T>
 
-	open suspend fun persist(@Valid entity: T): T {
-		sessionFactory.persist(entity)
-		return entity
-	}
+	open suspend fun persist(@Valid entity: T): T = sessionFactory.persist(entity)
 
-	open suspend fun findById(id: I): T? {
-		return sessionFactory.find(entityClass, id)
-	}
+	open suspend fun findById(id: I): T? = sessionFactory.find(entityClass, id)
 }
 
 /**
