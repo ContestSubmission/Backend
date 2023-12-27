@@ -12,4 +12,5 @@ class Person(
 	 * If you set this manually, you risk breaking the authentication
 	 */
 	var id: UUID? = null,
-)
+) {
+}

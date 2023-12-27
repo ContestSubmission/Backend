@@ -5,6 +5,7 @@ import com.github.contestsubmission.backend.feature.team.dto.TeamCreateDTO
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
 import com.github.contestsubmission.backend.util.rest.UriBuildable
 import com.github.contestsubmission.backend.util.rest.response
+import io.quarkus.logging.Log
 import io.quarkus.security.Authenticated
 import jakarta.inject.Inject
 import jakarta.validation.Valid
@@ -37,7 +38,7 @@ class TeamResource : UriBuildable {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Authenticated
-	suspend fun create(@Valid teamCreateDTO: TeamCreateDTO): Response {
+	suspend fun create(teamCreateDTO: TeamCreateDTO): Response {
 		val caller = userAuthenticationService.getUser() ?: return Response.status(Response.Status.UNAUTHORIZED).build()
 		val contest = contestRepository.findById(contestId) ?: throw NotFoundException("Contest not found")
 
@@ -60,11 +61,12 @@ class TeamResource : UriBuildable {
 		val contest = contestRepository.findById(contestId) ?: throw NotFoundException("Contest not found")
 
 		// will be replaced by role-based authorization later
-		if (caller != contest.organizer) {
+		if (caller.id != contest.organizer.id) {
 			return Response.status(Response.Status.FORBIDDEN).build()
 		}
 
 		val teams = teamRepository.findByContest(contest)
+		Log.error("uwu $teams")
 
 		return Response.ok(teams).build()
 	}

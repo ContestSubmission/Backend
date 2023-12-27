@@ -20,7 +20,12 @@ class Team(
 	var owner: Person = Person(),
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	var contest: Contest = Contest(),
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+	@JoinTable(
+		name = "team_member",
+		joinColumns = [JoinColumn(name = "team_id")],
+		inverseJoinColumns = [JoinColumn(name = "person_id")]
+	)
 	var members: MutableSet<Person> = mutableSetOf()
 ) : LazyFetchable {
 	override fun fetch(): Uni<Team> = Uni.combine().all().unis(

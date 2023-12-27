@@ -1,7 +1,7 @@
 package com.github.contestsubmission.backend.feature.contest.dto
 
 import com.github.contestsubmission.backend.feature.contest.Contest
-import com.github.contestsubmission.backend.util.rest.DTO
+import com.github.contestsubmission.backend.util.rest.ToEntityDTO
 import jakarta.validation.constraints.*
 import org.eclipse.microprofile.openapi.annotations.media.Schema
 import java.time.LocalDateTime
@@ -19,7 +19,7 @@ data class ContestCreateDTO(
 	@field:Schema(example = "5")
 	val maxTeamSize: Int,
 	val public: Boolean = false
-) : DTO<Contest> {
+) : ToEntityDTO<Contest> {
 	override fun toEntity() = Contest(
 		name = name,
 		description = description,
