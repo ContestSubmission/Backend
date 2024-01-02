@@ -23,6 +23,7 @@ dependencies {
 	implementation("io.quarkus:quarkus-resteasy-reactive")
 	implementation("io.quarkus:quarkus-resteasy-reactive-kotlin")
 	implementation("io.quarkus:quarkus-resteasy-reactive-jackson")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-hibernate6")
 	implementation("io.quarkus:quarkus-oidc")
 	implementation("io.quarkus:quarkus-flyway")
 	// required for flyway... ffs
