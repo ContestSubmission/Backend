@@ -1,12 +1,10 @@
 package com.github.contestsubmission.backend.migration
 
-import com.github.contestsubmission.backend.migration.FlywayMigrationProps.hasValidatedYet
 import io.quarkus.logging.Log
 import io.quarkus.runtime.Startup
 import io.quarkus.scheduler.Scheduler
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.flywaydb.core.Flyway
-import org.hibernate.SessionFactory
 
 @Startup
 /**
@@ -15,7 +13,6 @@ import org.hibernate.SessionFactory
  */
 class FlywayMigration internal constructor(
 	scheduler: Scheduler,
-	sessionFactory: SessionFactory,
 	@ConfigProperty(name = "quarkus.datasource.reactive.url") datasourceUrl: String,
 	@ConfigProperty(name = "quarkus.datasource.username") datasourceUsername: String,
 	@ConfigProperty(name = "quarkus.datasource.password") datasourcePassword: String,
@@ -35,16 +32,6 @@ class FlywayMigration internal constructor(
 				flyway.clean()
 			}
 			flyway.migrate()
-			// little hack to FIX STUPID FUCKING QUARKUS MISBEHAVING YET AGAIN
-			// I SWEAR TO GOD WHO THE FUCK CREATED THIS GARBAGE
-			// ITS JUST NOT WORKING 99% OF THE TIME AND THE REST IT JUST SUCKS ASS
-			// WHY THE FUCK DOES THIS METHOD BREAK AND BLOCK THE FUCKING WEBSERVER THREAD????
-			if (!hasValidatedYet) {
-				Log.info("Validating mapped objects...")
-				hasValidatedYet = true
-				sessionFactory.schemaManager
-					.validateMappedObjects()
-			}
 			scheduler.resume()
 			Log.info("Flyway migration complete!")
 		}

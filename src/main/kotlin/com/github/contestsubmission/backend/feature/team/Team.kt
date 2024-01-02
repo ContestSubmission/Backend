@@ -16,11 +16,12 @@ class Team(
 	@Column(nullable = false)
 	var name: String = "",
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(nullable = false)
 	var owner: Person = Person(),
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	// despite the fact that lazy would be smarter here, it doesn't work
+	// that is because QUARKUS FUCKING SUCKS YET AGAIN
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	var contest: Contest = Contest(),
-	@ManyToMany(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 		name = "team_member",
 		joinColumns = [JoinColumn(name = "team_id")],
