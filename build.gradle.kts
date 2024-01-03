@@ -32,11 +32,11 @@ dependencies {
 	implementation("io.quarkus:quarkus-kotlin")
 	implementation("io.quarkus:quarkus-jacoco")
 	implementation("io.quarkus:quarkus-opentelemetry")
+	implementation("io.opentelemetry.instrumentation:opentelemetry-jdbc")
 	implementation("io.quarkus:quarkus-scheduler")
-	implementation("io.quarkus:quarkus-hibernate-reactive-panache-kotlin")
+	implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
 	implementation("io.quarkus:quarkus-hibernate-validator")
 	implementation("io.quarkiverse.amazonservices:quarkus-amazon-s3")
-	implementation("io.quarkus:quarkus-reactive-pg-client")
 	implementation("io.quarkus:quarkus-container-image-jib")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("io.quarkus:quarkus-arc")
@@ -52,7 +52,7 @@ dependencies {
 }
 
 group = "com.github.contestsubmission.backend"
-version = "1.0.0"
+version = "2.0.0"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_21

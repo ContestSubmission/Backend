@@ -6,6 +6,8 @@ import com.github.contestsubmission.backend.util.db.findByIdFullFetch
 import com.github.contestsubmission.backend.util.rest.UriBuildable
 import com.github.contestsubmission.backend.util.rest.response
 import io.quarkus.security.Authenticated
+import io.smallrye.common.annotation.Blocking
+import io.smallrye.common.annotation.RunOnVirtualThread
 import jakarta.inject.Inject
 import jakarta.validation.Valid
 import jakarta.ws.rs.*
@@ -20,6 +22,8 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import java.util.*
 
 @Path("/contest")
+@RunOnVirtualThread
+@Blocking
 class ContestResource : UriBuildable {
 	@Inject
 	lateinit var contestRepository: ContestRepository
@@ -34,7 +38,7 @@ class ContestResource : UriBuildable {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Authenticated
-	open suspend fun createContest(@Valid contestCreateDTO: ContestCreateDTO): Response {
+	fun createContest(@Valid contestCreateDTO: ContestCreateDTO): Response {
 		val caller = userAuthenticationService.getUser() ?: return Response.status(Response.Status.UNAUTHORIZED).build()
 		val contest = contestCreateDTO.toEntity()
 		contest.organizer = caller
@@ -53,7 +57,7 @@ class ContestResource : UriBuildable {
 			mediaType = MediaType.APPLICATION_JSON, schema = Schema(implementation = Contest::class)
 		)]
 	)
-	open suspend fun getContest(@Valid id: UUID) = contestRepository.findByIdFullFetch(id).response()
+	fun getContest(@Valid id: UUID) = contestRepository.findByIdFullFetch(id).response()
 
 	@GET
 	@Path("/search")
@@ -63,5 +67,5 @@ class ContestResource : UriBuildable {
 			mediaType = MediaType.APPLICATION_JSON, schema = Schema(implementation = Contest::class, type = SchemaType.ARRAY)
 		)]
 	)
-	open suspend fun listContests(@QueryParam("term") term: String?): Response = contestRepository.search(term ?: "").response()
+	fun listContests(@QueryParam("term") term: String?): Response = contestRepository.search(term ?: "").response()
 }

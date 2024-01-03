@@ -2,9 +2,7 @@ package com.github.contestsubmission.backend.feature.contest
 
 import com.github.contestsubmission.backend.feature.user.Person
 import com.github.contestsubmission.backend.util.db.LazyFetchable
-import io.smallrye.mutiny.Uni
 import jakarta.persistence.*
-import org.hibernate.reactive.mutiny.Mutiny
 import java.time.LocalDateTime
 import java.util.*
 
@@ -23,5 +21,5 @@ class Contest(
 	var deadline: LocalDateTime = LocalDateTime.now().plusDays(7),
 	var maxTeamSize: Int = 1
 ) : LazyFetchable {
-	override fun fetch(): Uni<Person> = Mutiny.fetch(organizer)
+	override fun toFetch() = listOf(organizer)
 }

@@ -107,10 +107,15 @@ jobs:
 
       - name: Write package.json file
         run: |
+          # if the push is not a tag, append the run number to the version
+          if [[ "${{ github.ref }}" != "refs/tags/"* ]]; then
+            VERSION_SUFFIX="-SNAPSHOT.${{ github.run_number }}"
+          fi
+
           cat <<EOF > package.json
           {
             "name": "@contestsubmission/api-client",
-            "version": "${{ needs.build.outputs.application_version }}-SNAPSHOT.${{ github.run_number }}",
+            "version": "${{ needs.build.outputs.application_version }}$VERSION_SUFFIX",
             "repository": {
               "type": "git",
               "url": "git+https://github.com/ContestSubmission/Backend.git"
