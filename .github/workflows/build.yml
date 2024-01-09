@@ -107,10 +107,16 @@ jobs:
 
       - name: Write package.json file
         run: |
+          if [[ "$GITHUB_REF" != "refs/tags/"* ]]; then
+            VERSION_SUFFIX="-SNAPSHOT.${{ github.run_number }}"
+          fi
+          VERSION="${{ needs.build.outputs.application_version }}$VERSION_SUFFIX"
+
+          echo "Writing package.json for version $VERSION"
           cat <<EOF > package.json
           {
             "name": "@contestsubmission/api-client",
-            "version": "${{ needs.build.outputs.application_version }}-SNAPSHOT.${{ github.run_number }}",
+            "version": "$VERSION",
             "repository": {
               "type": "git",
               "url": "git+https://github.com/ContestSubmission/Backend.git"
