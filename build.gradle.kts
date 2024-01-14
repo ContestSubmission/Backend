@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	kotlin("jvm") version "1.9.20"
-	kotlin("plugin.allopen") version "1.9.20"
-	kotlin("plugin.jpa") version "1.9.20"
+	kotlin("jvm") version "1.9.22"
+	kotlin("plugin.allopen") version "1.9.22"
+	kotlin("plugin.jpa") version "1.9.22"
 	id("io.quarkus")
 }
 
@@ -17,7 +17,6 @@ val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
 dependencies {
-	implementation(enforcedPlatform("org.jetbrains.kotlin:kotlin-bom:1.9.20"))
 	implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
 	implementation(enforcedPlatform("${quarkusPlatformGroupId}:quarkus-amazon-services-bom:${quarkusPlatformVersion}"))
 	implementation("io.quarkus:quarkus-resteasy-reactive")
@@ -52,7 +51,7 @@ dependencies {
 }
 
 group = "com.github.contestsubmission.backend"
-version = "2.0.0"
+version = "2.2.0"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_21
