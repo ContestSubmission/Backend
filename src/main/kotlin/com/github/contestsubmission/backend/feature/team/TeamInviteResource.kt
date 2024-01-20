@@ -34,8 +34,13 @@ class TeamInviteResource {
 	fun accept(@RestQuery("invite") @NotNull invite: String) {
 		val jwt = jwtParser.parse(invite)
 		val teamId = jwt.subject ?: throw BadRequestException("Invalid invite")
-		val person = userAuthenticationService.getUser() ?: throw UnauthorizedException("You are not logged in!")
 		val team = teamRepository.findById(teamId.toUUID() ?: throw InternalServerErrorException("JWT contains invalid UUID!")) ?: throw NotFoundException("Team not found")
+
+		if (team.members.size >= team.contest.maxTeamSize) {
+			throw ForbiddenException("Team is already full!")
+		}
+
+		val person = userAuthenticationService.getUser() ?: throw UnauthorizedException("You are not logged in!")
 
 		teamRepository.addUserToTeam(person, team)
 	}
@@ -55,6 +60,10 @@ class TeamInviteResource {
 
 		if (!team.members.contains(person)) {
 			throw ForbiddenException("You are not a member of this team!")
+		}
+
+		if (team.members.size >= team.contest.maxTeamSize) {
+			throw ForbiddenException("Team is already full!")
 		}
 
 		val jwt = Jwt.claims().apply {
