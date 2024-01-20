@@ -24,6 +24,8 @@ dependencies {
 	implementation("io.quarkus:quarkus-resteasy-reactive-jackson")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-hibernate6")
 	implementation("io.quarkus:quarkus-oidc")
+	implementation("io.quarkus:quarkus-smallrye-jwt")
+	implementation("io.quarkus:quarkus-smallrye-jwt-build")
 	implementation("io.quarkus:quarkus-flyway")
 	// required for flyway... ffs
 	implementation("io.quarkus:quarkus-jdbc-postgresql")
@@ -51,7 +53,7 @@ dependencies {
 }
 
 group = "com.github.contestsubmission.backend"
-version = "2.2.1"
+version = "2.3.0"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_21
@@ -100,7 +102,7 @@ tasks.quarkusDev {
 	environmentVariables.put(disabledKubeConfig)
 }
 
-fun <K, V> MapProperty<K, V>.put(pair: Pair<K, V>): MapProperty<K, V> {
+fun <K : Any, V : Any> MapProperty<K, V>.put(pair: Pair<K, V>): MapProperty<K, V> {
 	this.put(pair.first, pair.second)
 	return this
 }

@@ -82,6 +82,10 @@ class TeamResource : UriBuildable {
 		val caller = userAuthenticationService.getUser() ?: return Response.status(Response.Status.UNAUTHORIZED).build()
 		val team = teamRepository.findByIdFullFetch(teamId) ?: throw NotFoundException("Team not found")
 
+		if (team.contest.id != contestId) {
+			return Response.status(Response.Status.NOT_FOUND).build()
+		}
+
 		// will be replaced by role-based authorization later
 		if (!team.members.any { it.id == caller.id } && team.contest.organizer.id != caller.id) {
 			return Response.status(Response.Status.FORBIDDEN).build()
