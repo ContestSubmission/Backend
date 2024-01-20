@@ -38,6 +38,8 @@ dependencies {
 	implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
 	implementation("io.quarkus:quarkus-hibernate-validator")
 	implementation("io.quarkiverse.amazonservices:quarkus-amazon-s3")
+	implementation("io.github.dyegosutil:aws-s3-presigned-post:0.1.0-beta.2")
+	implementation("software.amazon.awssdk:url-connection-client")
 	implementation("io.quarkus:quarkus-container-image-jib")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("io.quarkus:quarkus-arc")
@@ -53,7 +55,7 @@ dependencies {
 }
 
 group = "com.github.contestsubmission.backend"
-version = "2.3.1"
+version = "2.4.0"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_21

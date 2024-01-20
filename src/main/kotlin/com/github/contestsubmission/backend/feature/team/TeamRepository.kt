@@ -20,5 +20,7 @@ class TeamRepository : CRUDRepository<Team, UUID>() {
 	@Transactional
 	fun addUserToTeam(user: Person, team: Team) {
 		team.members.add(user)
+		// no clue if you need this, firstly, it only worked WITHOUT it, now, it only works WITH it
+		entityManager.merge(team)
 	}
 }
