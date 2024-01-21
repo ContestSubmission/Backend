@@ -1,6 +1,7 @@
 package com.github.contestsubmission.backend.feature.team
 
 import com.github.contestsubmission.backend.feature.contest.ContestRepository
+import com.github.contestsubmission.backend.feature.team.dto.EnumeratedTeamDTO
 import com.github.contestsubmission.backend.feature.team.dto.TeamCreateDTO
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
 import com.github.contestsubmission.backend.util.db.findByIdFullFetch
@@ -69,7 +70,7 @@ class TeamResource : UriBuildable {
 	@Path("/list")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Authenticated
-	fun list(): List<Team> {
+	fun list(): List<EnumeratedTeamDTO> {
 		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
 		val contest = contestRepository.findById(contestId) ?: throw NotFoundException("Contest not found")
 		// will be replaced by role-based authorization later
@@ -77,7 +78,7 @@ class TeamResource : UriBuildable {
 			throw ForbiddenException("Only the organizer can list teams")
 		}
 
-		return teamRepository.findByContest(contest)
+		return teamRepository.listByContest(contest)
 	}
 
 	@GET
