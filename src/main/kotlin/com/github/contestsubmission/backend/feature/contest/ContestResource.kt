@@ -1,11 +1,13 @@
 package com.github.contestsubmission.backend.feature.contest
 
 import com.github.contestsubmission.backend.feature.contest.dto.ContestCreateDTO
+import com.github.contestsubmission.backend.feature.contest.dto.ParticipatedContestDTO
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
 import com.github.contestsubmission.backend.util.db.findByIdFullFetch
 import com.github.contestsubmission.backend.util.rest.UriBuildable
 import com.github.contestsubmission.backend.util.rest.response
 import io.quarkus.security.Authenticated
+import io.quarkus.security.UnauthorizedException
 import io.smallrye.common.annotation.Blocking
 import io.smallrye.common.annotation.RunOnVirtualThread
 import jakarta.inject.Inject
@@ -73,4 +75,14 @@ class ContestResource : UriBuildable {
 		)]
 	)
 	fun listContests(@QueryParam("term") term: String?): Response = contestRepository.search(term ?: "").response()
+
+	@GET
+	@Path("/my")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Authenticated
+	fun myContests(): List<ParticipatedContestDTO> {
+		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
+
+		return contestRepository.findParticipatedContests(caller)
+	}
 }
