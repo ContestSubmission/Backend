@@ -8,9 +8,7 @@ import jakarta.transaction.Transactional
 import java.util.*
 
 @ApplicationScoped
-class TeamRepository : CRUDRepository<Team, UUID>() {
-	override val entityClass: Class<Team> = Team::class.java
-
+class TeamRepository : CRUDRepository<Team, UUID>(Team::class.java) {
 	fun findByContest(contest: Contest): List<Team> =
 		entityManager.createQuery("SELECT t FROM Team t WHERE t.contest = :contest", Team::class.java)
 			.setParameter("contest", contest)

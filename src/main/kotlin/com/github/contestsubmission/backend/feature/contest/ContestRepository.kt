@@ -5,8 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import java.util.*
 
 @ApplicationScoped
-class ContestRepository : CRUDRepository<Contest, UUID>() {
-	override val entityClass: Class<Contest> = Contest::class.java
+class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
 
 	fun search(term: String): MutableList<Contest>? =
 		entityManager.createQuery("""

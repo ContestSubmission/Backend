@@ -4,15 +4,16 @@ import jakarta.inject.Inject
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import jakarta.validation.Valid
+import kotlin.reflect.KClass
 
 /**
  * base class for CRUD repositories abstracting away some of the boilerplate code
   */
-abstract class CRUDRepository<T, I> {
+abstract class CRUDRepository<T : Any, I>(val entityClass: Class<T>) {
 	@Inject
 	lateinit var entityManager: EntityManager
 
-	abstract val entityClass: Class<T>
+	constructor(entityClass: KClass<T>) : this(entityClass.java)
 
 	@Transactional
 	open fun persist(@Valid entity: T): T {

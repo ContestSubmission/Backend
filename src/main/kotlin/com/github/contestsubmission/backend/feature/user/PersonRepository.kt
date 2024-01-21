@@ -5,6 +5,4 @@ import jakarta.enterprise.context.ApplicationScoped
 import java.util.UUID
 
 @ApplicationScoped
-class PersonRepository : CRUDRepository<Person, UUID>() {
-	override val entityClass: Class<Person> = Person::class.java
-}
+class PersonRepository : CRUDRepository<Person, UUID>(Person::class)

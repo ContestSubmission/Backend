@@ -1,6 +1,7 @@
 package com.github.contestsubmission.backend.feature.team
 
 import com.github.contestsubmission.backend.feature.contest.Contest
+import com.github.contestsubmission.backend.feature.submission.Submission
 import com.github.contestsubmission.backend.feature.user.Person
 import com.github.contestsubmission.backend.util.db.LazyFetchable
 import jakarta.persistence.*
@@ -25,7 +26,9 @@ class Team(
 		joinColumns = [JoinColumn(name = "team_id")],
 		inverseJoinColumns = [JoinColumn(name = "person_id")]
 	)
-	var members: MutableSet<Person> = mutableSetOf()
+	var members: MutableSet<Person> = mutableSetOf(),
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "team")
+	var submissions: MutableSet<Submission> = mutableSetOf()
 ) : LazyFetchable {
 	override fun toFetch() = listOf(owner, contest, members)
 }
