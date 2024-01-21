@@ -6,8 +6,8 @@ interface ToEntityDTO<E> {
 	fun toEntity(): E
 }
 
-interface FromEntityDTO<E, SELF : FromEntityDTO<E, SELF>> {
-	fun fromEntity(entity: E): SELF
+interface FromEntityDTO<E, DTO> {
+	fun fromEntity(entity: E): DTO
 }
 
 fun <E, R> E.mapDTO(mapper: E.() -> R): R = try {
@@ -15,5 +15,3 @@ fun <E, R> E.mapDTO(mapper: E.() -> R): R = try {
 } catch (e: Exception) {
 	throw DTOMappingException(e)
 }
-
-interface DTO<E, SELF : DTO<E, SELF>> : ToEntityDTO<E>, FromEntityDTO<E, SELF>
