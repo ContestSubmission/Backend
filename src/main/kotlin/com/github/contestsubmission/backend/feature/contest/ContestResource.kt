@@ -38,6 +38,11 @@ class ContestResource : UriBuildable {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Authenticated
+	@APIResponse(
+		responseCode = "200", description = "Contest created", content = [Content(
+			mediaType = MediaType.APPLICATION_JSON, schema = Schema(implementation = Contest::class)
+		)]
+	)
 	fun createContest(@Valid contestCreateDTO: ContestCreateDTO): Response {
 		val caller = userAuthenticationService.getUser() ?: return Response.status(Response.Status.UNAUTHORIZED).build()
 		val contest = contestCreateDTO.toEntity()

@@ -7,6 +7,7 @@ import com.github.contestsubmission.backend.util.db.findByIdFullFetch
 import com.github.contestsubmission.backend.util.rest.UriBuildable
 import com.github.contestsubmission.backend.util.rest.response
 import io.quarkus.security.Authenticated
+import io.quarkus.security.UnauthorizedException
 import io.smallrye.common.annotation.Blocking
 import io.smallrye.common.annotation.RunOnVirtualThread
 import jakarta.inject.Inject
@@ -16,6 +17,9 @@ import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.core.UriInfo
+import org.eclipse.microprofile.openapi.annotations.media.Content
+import org.eclipse.microprofile.openapi.annotations.media.Schema
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import java.util.*
 
 @Path("/contest/{contestId}/team")
@@ -42,8 +46,13 @@ class TeamResource : UriBuildable {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Authenticated
+	@APIResponse(
+		responseCode = "200", description = "Team created", content = [Content(
+			mediaType = MediaType.APPLICATION_JSON, schema = Schema(implementation = Team::class)
+		)]
+	)
 	fun create(@Valid teamCreateDTO: TeamCreateDTO): Response {
-		val caller = userAuthenticationService.getUser() ?: return Response.status(Response.Status.UNAUTHORIZED).build()
+		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
 		val contest = contestRepository.findById(contestId) ?: throw NotFoundException("Contest not found")
 
 		val team = teamCreateDTO.toEntity()
@@ -60,37 +69,34 @@ class TeamResource : UriBuildable {
 	@Path("/list")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Authenticated
-	fun list(): Response {
-		val caller = userAuthenticationService.getUser() ?: return Response.status(Response.Status.UNAUTHORIZED).build()
+	fun list(): List<Team> {
+		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
 		val contest = contestRepository.findById(contestId) ?: throw NotFoundException("Contest not found")
-
 		// will be replaced by role-based authorization later
 		if (caller.id != contest.organizer.id) {
-			return Response.status(Response.Status.FORBIDDEN).build()
+			throw ForbiddenException("Only the organizer can list teams")
 		}
 
-		val teams = teamRepository.findByContest(contest)
-
-		return Response.ok(teams).build()
+		return teamRepository.findByContest(contest)
 	}
 
 	@GET
 	@Path("{teamId}/get")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Authenticated
-	fun get(@PathParam("teamId") teamId: UUID): Response {
-		val caller = userAuthenticationService.getUser() ?: return Response.status(Response.Status.UNAUTHORIZED).build()
+	fun get(@PathParam("teamId") teamId: UUID): Team {
+		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
 		val team = teamRepository.findByIdFullFetch(teamId) ?: throw NotFoundException("Team not found")
 
 		if (team.contest.id != contestId) {
-			return Response.status(Response.Status.NOT_FOUND).build()
+			throw NotFoundException("Team not found")
 		}
 
 		// will be replaced by role-based authorization later
 		if (!team.members.any { it.id == caller.id } && team.contest.organizer.id != caller.id) {
-			return Response.status(Response.Status.FORBIDDEN).build()
+			throw ForbiddenException("Only the organizer and team members can view a team")
 		}
 
-		return Response.ok(team).build()
+		return team
 	}
 }
