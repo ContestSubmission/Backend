@@ -1,0 +1,13 @@
+{
+	"name": "@contestsubmission/api-client",
+	"version": "$VERSION",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ContestSubmission/Backend.git"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/ContestSubmission/Backend/issues"
+	},
+	"homepage": "https://github.com/ContestSubmission/Backend#readme"
+}
