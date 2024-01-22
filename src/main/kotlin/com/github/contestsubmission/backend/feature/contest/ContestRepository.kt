@@ -24,7 +24,8 @@ class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
 				NEW com.github.contestsubmission.backend.feature.contest.dto.ParticipatedContestDTO(
 					c.id,
 					c.name,
-					(c.organizer = :caller)
+					(c.organizer = :caller),
+					t
 			) FROM Contest c
 			LEFT JOIN c.teams t
 			LEFT JOIN t.members m
