@@ -19,13 +19,13 @@ class Contest(
 	override var name: String = "",
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(nullable = false)
-	var organizer: Person = Person(),
+	var organizer: Person? = Person(),
 	var description: String? = null,
 	var public: Boolean = false,
 	var deadline: LocalDateTime = LocalDateTime.now().plusDays(7),
 	var maxTeamSize: Int = 1,
 	@OneToMany(mappedBy = "contest", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-	var teams: MutableList<Team> = mutableListOf()
+	var teams: MutableList<Team>? = mutableListOf()
 ) : ContestDTO, LazyFetchable {
-	override fun toFetch() = listOf(organizer)
+	override fun toFetch() = listOf(organizer, teams)
 }

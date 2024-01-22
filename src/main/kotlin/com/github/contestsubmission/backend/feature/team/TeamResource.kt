@@ -74,11 +74,11 @@ class TeamResource : UriBuildable {
 		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
 		val contest = contestRepository.findById(contestId) ?: throw NotFoundException("Contest not found")
 		// will be replaced by role-based authorization later
-		if (caller.id != contest.organizer.id) {
-			throw ForbiddenException("Only the organizer can list teams")
+		if (caller.id == contest.organizer?.id) {
+			return teamRepository.listByContest(contest)
 		}
+		throw ForbiddenException("Only the organizer can list teams")
 
-		return teamRepository.listByContest(contest)
 	}
 
 	@GET
@@ -93,11 +93,10 @@ class TeamResource : UriBuildable {
 			throw NotFoundException("Team not found")
 		}
 
-		// will be replaced by role-based authorization later
-		if (!team.members.any { it.id == caller.id } && team.contest.organizer.id != caller.id) {
-			throw ForbiddenException("Only the organizer and team members can view a team")
+		if (team.members.any { it.id == caller.id } || team.contest.organizer?.id == caller.id) {
+			return team
 		}
 
-		return team
+		throw ForbiddenException("Only the organizer and team members can view a team")
 	}
 }

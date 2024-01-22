@@ -5,5 +5,5 @@ import org.hibernate.Hibernate
 interface LazyFetchable {
 	fun fetch() = toFetch().forEach(Hibernate::initialize)
 
-	fun toFetch(): Collection<Any>
+	fun toFetch(): Collection<Any?>
 }

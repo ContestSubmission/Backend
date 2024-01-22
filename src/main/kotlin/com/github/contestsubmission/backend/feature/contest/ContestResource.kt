@@ -1,7 +1,6 @@
 package com.github.contestsubmission.backend.feature.contest
 
 import com.github.contestsubmission.backend.feature.contest.dto.ContestCreateDTO
-import com.github.contestsubmission.backend.feature.contest.dto.ContestDTO
 import com.github.contestsubmission.backend.feature.contest.dto.ParticipatedContestDTO
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
 import com.github.contestsubmission.backend.util.db.findByIdFullFetch
@@ -80,11 +79,6 @@ class ContestResource : UriBuildable {
 	@GET
 	@Path("/my")
 	@Produces(MediaType.APPLICATION_JSON)
-	@APIResponse(
-		responseCode = "200", description = "Contests found (or not)", content = [Content(
-			mediaType = MediaType.APPLICATION_JSON, schema = Schema(implementation = ParticipatedContestDTO::class, oneOf = [ContestDTO::class], type = SchemaType.ARRAY)
-		)]
-	)
 	@Authenticated
 	fun myContests(): List<ParticipatedContestDTO> {
 		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
