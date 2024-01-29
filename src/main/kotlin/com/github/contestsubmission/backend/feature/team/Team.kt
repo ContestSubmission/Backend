@@ -14,7 +14,7 @@ class Team(
 	var id: UUID? = null,
 	@Column(nullable = false)
 	var name: String = "",
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	var owner: Person = Person(),
 	// despite the fact that lazy would be smarter here, it doesn't work
 	// that is because QUARKUS FUCKING SUCKS YET AGAIN
