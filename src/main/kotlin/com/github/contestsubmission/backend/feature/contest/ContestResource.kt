@@ -2,6 +2,7 @@ package com.github.contestsubmission.backend.feature.contest
 
 import com.github.contestsubmission.backend.feature.contest.dto.ContestCreateDTO
 import com.github.contestsubmission.backend.feature.contest.dto.ParticipatedContestDTO
+import com.github.contestsubmission.backend.feature.contest.dto.PersonalContestDTO
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
 import com.github.contestsubmission.backend.util.db.findByIdFullFetch
 import com.github.contestsubmission.backend.util.rest.UriBuildable
@@ -65,6 +66,22 @@ class ContestResource : UriBuildable {
 		)]
 	)
 	fun getContest(@Valid id: UUID) = contestRepository.findByIdFullFetch(id).response()
+
+	@GET
+	@Path("/{id}/personal")
+	@Produces(MediaType.APPLICATION_JSON)
+	@APIResponse(responseCode = "404", description = "Contest not found")
+	@APIResponse(
+		responseCode = "200", description = "Contest found", content = [Content(
+			mediaType = MediaType.APPLICATION_JSON, schema = Schema(implementation = PersonalContestDTO::class)
+		)]
+	)
+	@Authenticated
+	fun getPersonalContest(@Valid id: UUID): PersonalContestDTO {
+		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
+
+		return contestRepository.getPersonalContest(caller, id) ?: throw NotFoundException("Contest not found")
+	}
 
 	@GET
 	@Path("/search")
