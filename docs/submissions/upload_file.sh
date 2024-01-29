@@ -20,4 +20,5 @@ upload_url="$(jq -r '.url' response.json)"
 download_url="$upload_url/$key"
 token="$(jq -r '.jwt' response.json)"
 
-curl -F key="$key" $params -X POST "$upload_url" -F "file=@$filepath" -vLk && printf "Successfully uploaded to %s\nToken: %s" "$download_url" "$token"
+curl -F key="$key" $params -X POST "$upload_url" -F "file=@$filepath" -vLk --fail-with-body \
+	&& printf "Successfully uploaded to %s\nToken: %s" "$download_url" "$token"

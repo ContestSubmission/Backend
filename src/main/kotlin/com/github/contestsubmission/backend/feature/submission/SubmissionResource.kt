@@ -7,7 +7,6 @@ import com.github.contestsubmission.backend.util.toUUID
 import io.github.dyegosutil.awspresignedpost.conditions.key.ExactKeyCondition
 import io.github.dyegosutil.awspresignedpost.postparams.PostParams
 import io.github.dyegosutil.awspresignedpost.signer.S3PostSigner
-import io.quarkus.logging.Log
 import io.quarkus.security.Authenticated
 import io.quarkus.security.UnauthorizedException
 import io.smallrye.jwt.auth.principal.JWTParser
@@ -126,9 +125,8 @@ class SubmissionResource {
 		val passedURL = URL(handInSubmissionDTO.url)
 		val uploadedURL = URL(fileName)
 		val endpoint = URL(endpointOverride)
-		Log.info("${passedURL.file}:$uploadedURL ${passedURL.host}:${endpoint.host}")
 		if (passedURL.file != uploadedURL.file || passedURL.host != endpoint.host || passedURL.port != endpoint.port) {
-			throw BadRequestException("Illegal request - mismatched file name or host")
+			throw BadRequestException("Illegal request - mismatched file name or host. passedURL: $passedURL, uploadedURL: $uploadedURL, endpoint: $endpoint")
 		}
 
 		val now = now(systemUTC())
