@@ -1,5 +1,6 @@
 package com.github.contestsubmission.backend.feature.contest
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.contestsubmission.backend.feature.contest.dto.ContestDTO
 import com.github.contestsubmission.backend.feature.team.Team
 import com.github.contestsubmission.backend.feature.user.Person
@@ -25,6 +26,7 @@ class Contest(
 	var deadline: LocalDateTime = LocalDateTime.now().plusDays(7),
 	var maxTeamSize: Int = 1,
 	@OneToMany(mappedBy = "contest", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+	@JsonIgnoreProperties("contest")
 	var teams: MutableList<Team>? = mutableListOf()
 ) : ContestDTO, LazyFetchable {
 	override fun toFetch() = listOf(organizer, teams)
