@@ -2,11 +2,10 @@ package com.github.contestsubmission.backend.feature.contest
 
 import com.github.contestsubmission.backend.feature.contest.dto.ParticipatedContestDTO
 import com.github.contestsubmission.backend.feature.contest.dto.PersonalContestDTO
-import com.github.contestsubmission.backend.feature.team.Team
+import com.github.contestsubmission.backend.feature.submission.Submission
 import com.github.contestsubmission.backend.feature.user.Person
 import com.github.contestsubmission.backend.util.db.CRUDRepository
 import jakarta.enterprise.context.ApplicationScoped
-import org.hibernate.Hibernate
 import java.util.*
 
 @ApplicationScoped
@@ -37,28 +36,48 @@ class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
 			.setParameter("caller", caller)
 			.resultList
 
-	fun getPersonalContest(caller: Person, contestId: UUID): PersonalContestDTO? =
-		entityManager.createQuery(
+	// cast from MutableList -> List
+	@Suppress("UNCHECKED_CAST", "kotlin:S6531")
+	fun getPersonalContest(caller: Person, contestId: UUID): PersonalContestDTO? {
+		val personalContestDTO =  entityManager.createQuery(
 			"""
-			SELECT NEW com.github.contestsubmission.backend.feature.contest.dto.PersonalContestDTO(
-				c.name,
-				c.organizer,
-				c.description,
-				c.deadline,
-				c.maxTeamSize,
-				t
-			)
-			FROM Contest c
-			LEFT JOIN c.teams t
-			LEFT JOIN FETCH t.members m
-			WHERE c.id = :contestId AND (c.organizer = :caller OR m = :caller)
-		""".trimIndent(),
+				SELECT NEW com.github.contestsubmission.backend.feature.contest.dto.PersonalContestDTO(
+					c.name,
+					c.organizer,
+					c.description,
+					c.deadline,
+					c.maxTeamSize,
+					t
+				)
+				FROM Contest c
+				LEFT JOIN c.teams t
+				LEFT JOIN FETCH t.members m
+				WHERE c.id = :contestId AND (c.organizer = :caller OR m = :caller)
+			""".trimIndent(),
 			PersonalContestDTO::class.java
 		)
 			.setParameter("caller", caller)
 			.setParameter("contestId", contestId)
-			.singleResult
+			.resultList
+			.firstOrNull()
 			// epic hack to make sure that the team is null if the caller is the organizer
 			// this tells the client that the user cannot submit something
 			?.run { if (organizer == caller) copy(team = null) else this }
+
+		if (personalContestDTO?.team == null) return personalContestDTO
+
+		val submissions: List<Submission> = entityManager.createQuery(
+			"""
+				SELECT s
+				FROM Submission s
+				WHERE s.team.id = :teamId
+				ORDER BY s.handedInAt DESC
+			""".trimIndent(),
+		).setParameter("teamId", personalContestDTO.team.id)
+			.resultList as List<Submission>
+
+		personalContestDTO.submissions = submissions
+
+		return personalContestDTO
+	}
 }
