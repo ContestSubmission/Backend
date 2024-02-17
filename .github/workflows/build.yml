@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       application_version: ${{ steps.build-docker-image.outputs.application_version }}
+      full_version: ${{ steps.build-docker-image.outputs.full_version }}
     steps:
       - uses: actions/checkout@v4
 
@@ -87,20 +88,38 @@ jobs:
           name: kubernetes-manifests
           path: build/kubernetes
 
+  kubernetes-manifests:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: kubernetes-manifests
+
+      - name: Get Branch
+        id: get-branch
+        run: |
+          raw=$(git branch -r --contains ${{ github.ref }})
+          branch=${raw/origin\/}
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
       - name: Publish Kubernetes manifests to manifests repo
         uses: cpina/github-action-push-to-another-repository@v1.7.2
         id: publish-kubernetes-manifests
         env:
           SSH_DEPLOY_KEY: ${{ secrets.KUBERNETES_MANIFESTS_DEPLOY_KEY }}
         with:
-          source-directory: build/kubernetes
+          source-directory: .
           target-directory: backend
           destination-github-username: ContestSubmission
           destination-repository-name: KubernetesManifests
           user-name: 'GitHub Actions (Backend)'
           user-email: 'actions@github.com'
-          commit-message: '[${{ steps.build-docker-image.outputs.full_version }}] Deploy Backend resources of ORIGIN_COMMIT'
-          target-branch: ${{ (github.ref_name == 'main' || github.event_name == 'tag') && 'main' || github.ref_name }}
+          commit-message: '[${{ needs.build.outputs.full_version }}] Deploy Backend resources of ORIGIN_COMMIT'
+          # if running on main branch, the target branch will be main, else, either the branch or tag name
+          target-branch: ${{ steps.get-branch.outputs.branch }}
+          # since the target branch may be different if not running on main or tag
+          create-target-branch-if-needed: true
 
       - name: Tag Kubernetes manifests repo commit
         run: |
