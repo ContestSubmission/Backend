@@ -116,7 +116,7 @@ jobs:
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
 
       - name: Publish Kubernetes manifests to manifests repo
-        uses: SIMULATAN/github-action-push-to-another-repository@custom-clone-dir
+        uses: SIMULATAN/github-action-push-to-another-repository@short-origin-commit
         id: publish-kubernetes-manifests
         env:
           SSH_DEPLOY_KEY: ${{ secrets.KUBERNETES_MANIFESTS_DEPLOY_KEY }}
@@ -128,7 +128,7 @@ jobs:
           destination-repository-name: KubernetesManifests
           user-name: 'GitHub Actions (Backend)'
           user-email: 'github-actions@github.com'
-          commit-message: '[${{ needs.build.outputs.full_version }}] Deploy Backend resources of ORIGIN_COMMIT'
+          commit-message: '[${{ needs.build.outputs.full_version }}] Update backend (ORIGIN_COMMIT_SHORT)'
           # if running on main branch, the target branch will be main, else, either the branch or tag name
           target-branch: ${{ steps.get-branch.outputs.branch }}
           # since the target branch may be different if not running on main or tag
