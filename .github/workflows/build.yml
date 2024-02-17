@@ -137,12 +137,12 @@ jobs:
       - name: Tag Kubernetes manifests repo commit
         run: |
           id
-          ls
+          ls -la
           echo $DESTINATION_CLONED_DIRECTORY
           pwd
           cd $DESTINATION_CLONED_DIRECTORY
           echo "--- in destination ---"
-          ls
+          ls -la
           pwd
 
           # immutable tag - in no circumstance (apart from reruns?) this is duplicated
