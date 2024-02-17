@@ -136,7 +136,14 @@ jobs:
 
       - name: Tag Kubernetes manifests repo commit
         run: |
+          id
+          ls
+          echo $DESTINATION_CLONED_DIRECTORY
+          pwd
           cd $DESTINATION_CLONED_DIRECTORY
+          echo "--- in destination ---"
+          ls
+          pwd
 
           # immutable tag - in no circumstance (apart from reruns?) this is duplicated
           git tag "${{ needs.build.outputs.full_version }}"
