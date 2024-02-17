@@ -112,6 +112,7 @@ jobs:
           cd backend
           raw=$(git branch -r --contains ${{ github.ref }})
           branch=${raw/origin\/}
+          echo "branch:'$branch'"
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
 
       - name: Publish Kubernetes manifests to manifests repo
