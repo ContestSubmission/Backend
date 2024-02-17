@@ -116,7 +116,7 @@ jobs:
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
 
       - name: Publish Kubernetes manifests to manifests repo
-        uses: cpina/github-action-push-to-another-repository@v1.7.2
+        uses: SIMULATAN/github-action-push-to-another-repository@v1.8.0
         id: publish-kubernetes-manifests
         env:
           SSH_DEPLOY_KEY: ${{ secrets.KUBERNETES_MANIFESTS_DEPLOY_KEY }}
@@ -135,8 +135,7 @@ jobs:
 
       - name: Tag Kubernetes manifests repo commit
         run: |
-          echo "Clone dir: $CLONE_DIR"
-          cd $CLONE_DIR
+          cd $DESTINATION_CLONED_DIRECTORY
 
           # immutable tag - in no circumstance (apart from reruns?) this is duplicated
           git tag "${{ steps.build-docker-image.outputs.full_version }}"
