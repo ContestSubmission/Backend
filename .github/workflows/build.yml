@@ -135,7 +135,8 @@ jobs:
 
       - name: Tag Kubernetes manifests repo commit
         run: |
-          cd $DESTINATION_CLONED_DIRECTORY
+          echo "Clone dir: $CLONE_DIR"
+          cd $CLONE_DIR
 
           # immutable tag - in no circumstance (apart from reruns?) this is duplicated
           git tag "${{ steps.build-docker-image.outputs.full_version }}"
