@@ -135,20 +135,26 @@ jobs:
           create-target-branch-if-needed: true
 
       - name: Tag Kubernetes manifests repo commit
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.KUBERNETES_MANIFESTS_DEPLOY_KEY }}
         run: |
-          id
-          ls -la
-          echo $DESTINATION_CLONED_DIRECTORY
-          pwd
           cd $DESTINATION_CLONED_DIRECTORY
-          echo "--- in destination ---"
-          ls -la
-          pwd
+          mkdir --parents "$HOME/.ssh"
+          DEPLOY_KEY_FILE="$HOME/.ssh/deploy_key"
+          echo "${SSH_DEPLOY_KEY}" > "$DEPLOY_KEY_FILE"
+          chmod 600 "$DEPLOY_KEY_FILE"
 
+          SSH_KNOWN_HOSTS_FILE="$HOME/.ssh/known_hosts"
+          ssh-keyscan -H "$GITHUB_SERVER" > "$SSH_KNOWN_HOSTS_FILE"
+
+          export GIT_SSH_COMMAND="ssh -i "$DEPLOY_KEY_FILE" -o UserKnownHostsFile=$SSH_KNOWN_HOSTS_FILE"
+
+          echo "Tagging with ${{ needs.build.outputs.full_version }}"
           # immutable tag - in no circumstance (apart from reruns?) this is duplicated
           git tag "${{ needs.build.outputs.full_version }}"
           # floating tag - points to the latest build of the minor release
           if [ "${{github.event_name}}" = "tag" ]; then
+            echo "Tagging with ${{ needs.build.outputs.application_version }}"
             git tag -f "${{ needs.build.outputs.application_version }}"
           fi
           git push --tags
