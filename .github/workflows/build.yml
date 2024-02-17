@@ -78,11 +78,20 @@ jobs:
       - name: Push docker image
         run: docker push --all-tags ghcr.io/contestsubmission/contestsubmission-backend
 
+      - name: Checkout history
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          path: backend-history
+          sparse-checkout: |
+            .git
+          fetch-depth: 0
+
       - name: Get Branch
         id: get-branch
         run: |
           # lstrip removes `refs/remotes/origin/`
-          branch="$(git branch -r --contains "${{ github.ref }}" --format "%(refname:lstrip=3)")"
+          branch="$(cd backend-history && git branch -r --contains "${{ github.ref }}" --format "%(refname:lstrip=3)")"
           echo "branch:'$branch'"
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
 
