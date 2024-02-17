@@ -100,7 +100,7 @@ jobs:
           user-name: 'GitHub Actions (Backend)'
           user-email: 'actions@github.com'
           commit-message: '[${{ steps.build-docker-image.outputs.full_version }}] Deploy Backend resources of ORIGIN_COMMIT'
-          target-branch: ${{ (github.ref_name == "main" || github.event_name == "tag") && 'main' || github.ref_name }}
+          target-branch: ${{ (github.ref_name == 'main' || github.event_name == 'tag') && 'main' || github.ref_name }}
 
       - name: Tag Kubernetes manifests repo commit
         run: |
