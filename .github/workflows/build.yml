@@ -121,7 +121,7 @@ jobs:
         env:
           SSH_DEPLOY_KEY: ${{ secrets.KUBERNETES_MANIFESTS_DEPLOY_KEY }}
         with:
-          clone-dir: KubernetesManifests
+          clone-directory: KubernetesManifests
           source-directory: kubernetes/
           target-directory: backend
           destination-github-username: ContestSubmission
@@ -139,10 +139,10 @@ jobs:
           cd $DESTINATION_CLONED_DIRECTORY
 
           # immutable tag - in no circumstance (apart from reruns?) this is duplicated
-          git tag "${{ steps.build-docker-image.outputs.full_version }}"
+          git tag "${{ needs.build.outputs.full_version }}"
           # floating tag - points to the latest build of the minor release
           if [ "${{github.event_name}}" = "tag" ]; then
-            git tag -f "${{ steps.build-docker-image.outputs.application_version }}"
+            git tag -f "${{ needs.build.outputs.application_version }}"
           fi
           git push --tags
 
