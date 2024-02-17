@@ -125,7 +125,7 @@ jobs:
           path: kubernetes/
 
       - name: Publish Kubernetes manifests to manifests repo
-        uses: SIMULATAN/github-action-push-to-another-repository@short-origin-commit
+        uses: SIMULATAN/github-action-push-to-another-repository@v1.10.0
         id: publish-kubernetes-manifests
         env:
           SSH_DEPLOY_KEY: ${{ secrets.KUBERNETES_MANIFESTS_DEPLOY_KEY }}
