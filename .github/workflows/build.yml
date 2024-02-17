@@ -116,11 +116,12 @@ jobs:
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
 
       - name: Publish Kubernetes manifests to manifests repo
-        uses: SIMULATAN/github-action-push-to-another-repository@v1.8.0
+        uses: SIMULATAN/github-action-push-to-another-repository@custom-clone-dir
         id: publish-kubernetes-manifests
         env:
           SSH_DEPLOY_KEY: ${{ secrets.KUBERNETES_MANIFESTS_DEPLOY_KEY }}
         with:
+          clone-dir: KubernetesManifests
           source-directory: kubernetes/
           target-directory: backend
           destination-github-username: ContestSubmission
