@@ -95,10 +95,21 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: kubernetes-manifests
+          path: kubernetes/
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          path: backend
+          # only the history is of interest, no files whatsoever
+          sparse-checkout: |
+            .git
 
       - name: Get Branch
         id: get-branch
         run: |
+          cd backend
           raw=$(git branch -r --contains ${{ github.ref }})
           branch=${raw/origin\/}
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
@@ -109,12 +120,12 @@ jobs:
         env:
           SSH_DEPLOY_KEY: ${{ secrets.KUBERNETES_MANIFESTS_DEPLOY_KEY }}
         with:
-          source-directory: .
+          source-directory: kubernetes/
           target-directory: backend
           destination-github-username: ContestSubmission
           destination-repository-name: KubernetesManifests
           user-name: 'GitHub Actions (Backend)'
-          user-email: 'actions@github.com'
+          user-email: 'github-actions@github.com'
           commit-message: '[${{ needs.build.outputs.full_version }}] Deploy Backend resources of ORIGIN_COMMIT'
           # if running on main branch, the target branch will be main, else, either the branch or tag name
           target-branch: ${{ steps.get-branch.outputs.branch }}
