@@ -55,7 +55,7 @@ dependencies {
 }
 
 group = "com.github.contestsubmission.backend"
-version = "2.6.1"
+version = "2.7.0"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_21
