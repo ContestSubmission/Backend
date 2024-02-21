@@ -3,6 +3,7 @@ package com.github.contestsubmission.backend.feature.user
 import com.github.contestsubmission.backend.feature.team.Team
 import com.github.contestsubmission.backend.feature.team.TeamRepository
 import com.github.contestsubmission.backend.util.toUUID
+import io.quarkus.logging.Log
 import jakarta.enterprise.context.RequestScoped
 import jakarta.inject.Inject
 import jakarta.ws.rs.ForbiddenException
@@ -15,19 +16,20 @@ class UserAuthenticationService {
 	@Inject
 	lateinit var userRepository: PersonRepository
 
-	fun getUserByCallerId(callerId: UUID): Person? {
-		return userRepository.findById(callerId)
+	fun getOrCreatePerson(callerId: UUID): Person? {
+		return userRepository.findById(callerId) ?: createUser(Person(callerId))
 	}
 
 	@Inject
 	lateinit var jwt: JsonWebToken
 
-	fun getUser(): Person? = getUserByCallerId(getUUID())
+	fun getUser(): Person? = getOrCreatePerson(getUUID())
 
 	fun getUUID() = jwt.claim<String>("sub").orElseThrow { IllegalStateException("JWT does not contain an id") }
 		.toUUID() ?: throw IllegalStateException("id is not a valid UUID")
 
 	fun createUser(person: Person): Person {
+		Log.info("Creating person record for ${person.id}")
 		return userRepository.persist(person)
 	}
 
