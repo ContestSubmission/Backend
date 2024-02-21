@@ -3,6 +3,7 @@ package com.github.contestsubmission.backend.feature.team
 import com.github.contestsubmission.backend.feature.contest.ContestRepository
 import com.github.contestsubmission.backend.feature.team.dto.EnumeratedTeamDTO
 import com.github.contestsubmission.backend.feature.team.dto.TeamCreateDTO
+import com.github.contestsubmission.backend.feature.team.dto.TeamGetDTO
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
 import com.github.contestsubmission.backend.util.db.findByIdFullFetch
 import com.github.contestsubmission.backend.util.rest.UriBuildable
@@ -85,7 +86,7 @@ class TeamResource : UriBuildable {
 	@Path("{teamId}/get")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Authenticated
-	fun get(@PathParam("teamId") teamId: UUID): Team {
+	fun get(@PathParam("teamId") teamId: UUID): TeamGetDTO {
 		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
 		val team = teamRepository.findByIdFullFetch(teamId) ?: throw NotFoundException("Team not found")
 
@@ -94,7 +95,7 @@ class TeamResource : UriBuildable {
 		}
 
 		if (team.members.any { it.id == caller.id } || team.contest.organizer?.id == caller.id) {
-			return team
+			return TeamGetDTO.fromEntity(team)
 		}
 
 		throw ForbiddenException("Only the organizer and team members can view a team")

@@ -30,5 +30,5 @@ class Team(
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "team")
 	var submissions: MutableSet<Submission> = mutableSetOf()
 ) : LazyFetchable {
-	override fun toFetch() = listOf(owner, contest, members)
+	override fun toFetch() = listOf(owner, contest, members, submissions)
 }

@@ -13,26 +13,28 @@ import java.util.*
 @RequestScoped
 class UserAuthenticationService {
 	@Inject
-	lateinit var userRepository: PersonRepository
+	protected lateinit var userRepository: PersonRepository
 
 	fun getUserByCallerId(callerId: UUID): Person? {
 		return userRepository.findById(callerId)
 	}
 
 	@Inject
-	lateinit var jwt: JsonWebToken
+	protected lateinit var jwt: JsonWebToken
 
 	fun getUser(): Person? = getUserByCallerId(getUUID())
 
 	fun getUUID() = jwt.claim<String>("sub").orElseThrow { IllegalStateException("JWT does not contain an id") }
 		.toUUID() ?: throw IllegalStateException("id is not a valid UUID")
 
+	fun getEmail(): String? = jwt.getClaim("email")
+
 	fun createUser(person: Person): Person {
 		return userRepository.persist(person)
 	}
 
 	@Inject
-	lateinit var teamRepository: TeamRepository
+	protected lateinit var teamRepository: TeamRepository
 
 	fun getTeam(teamId: UUID, contestId: UUID? = null): Team {
 		val user = getUser() ?: throw NotFoundException("User not found")
