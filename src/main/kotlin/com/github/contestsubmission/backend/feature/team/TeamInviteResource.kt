@@ -31,18 +31,27 @@ class TeamInviteResource {
 	@Path("invite/accept")
 	@POST
 	@Authenticated
-	fun accept(@RestQuery("invite") @NotNull invite: String) {
+	fun accept(@RestQuery("invite") @NotNull invite: String): Response {
 		val jwt = jwtParser.parse(invite)
-		val teamId = jwt.subject ?: throw BadRequestException("Invalid invite")
-		val team = teamRepository.findById(teamId.toUUID() ?: throw InternalServerErrorException("JWT contains invalid UUID!")) ?: throw NotFoundException("Team not found")
+		val teamId = jwt.getClaim<String>("teamId").toUUID() ?: throw InternalServerErrorException("JWT contains invalid UUID!")
+		val team = teamRepository.findById(teamId)
+			?: throw NotFoundException("Team not found")
 
 		if (team.members.size >= team.contest.maxTeamSize) {
-			throw ForbiddenException("Team is already full!")
+			return Response.status(Response.Status.BAD_REQUEST).entity("Team is already full!").build()
 		}
 
 		val person = userAuthenticationService.getUser() ?: throw UnauthorizedException("You are not logged in!")
 
+		if (jwt.subject != userAuthenticationService.getEmail()) {
+			return Response.status(Response.Status.BAD_REQUEST)
+				.entity("Mismatched mail address - make sure your primary mail is the same as the invited one!")
+				.build()
+		}
+
 		teamRepository.addUserToTeam(person, team)
+
+		return Response.noContent().build()
 	}
 
 	@Inject
@@ -67,11 +76,15 @@ class TeamInviteResource {
 		}
 
 		val jwt = Jwt.claims().apply {
-			subject(teamId.toString())
+			subject(email)
+			claim("contestId", contestId)
+			claim("teamId", teamId)
 			expiresIn(24.hours)
 		}.sign()
 
-		mailerService.sendInviteMail(email, contestId, jwt)
+		mailerService.sendInviteMail(email, team, jwt)
+			.await()
+			.indefinitely()
 
 		// the mail service is async, so we can return immediately
 		return Response.accepted().build()
