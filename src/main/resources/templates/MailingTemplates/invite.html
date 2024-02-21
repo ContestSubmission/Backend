@@ -1,0 +1,72 @@
+<style>
+	html {
+		background: radial-gradient(89.33% 89.33% at 100% 10.67%, rgba(212, 25, 118, 0.33) 0%, rgba(212, 25, 118, 0.00) 100%),
+		radial-gradient(88.75% 88.75% at 0% 11.25%, rgba(79, 70, 229, 0.33) 0%, rgba(79, 70, 229, 0.00) 100%),
+		#242C46 no-repeat;
+		min-height: 100vh;
+		min-width: 100vw;
+	}
+
+	* {
+		color: rgba(249, 250, 251, 1);
+		font-family: ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji",Segoe UI Symbol,"Noto Color Emoji";
+		text-align: center;
+	}
+
+	#container {
+		padding-top: 1.5em;
+		padding-bottom: 0;
+		margin: auto;
+		max-width: 1000px;
+	}
+
+	h1 {
+		font-weight: 800;
+		font-size: 2.75em;
+		margin: 0;
+		line-height: 1;
+	}
+
+	p {
+		margin: 0;
+	}
+
+	#join-button {
+		display: inline-block;
+		border-radius: 0.5em;
+		background-color: rgb(31, 41, 55);
+		text-decoration: none;
+		padding: 1em 3em;
+		transition: background-color 0.2s;
+	}
+
+	#join-button:hover {
+		background-color: rgba(31, 41, 55, 0.8);
+	}
+
+	#description p {
+		margin: 0.25em;
+	}
+
+	.website-link {
+		transition: color 0.2s;
+	}
+
+	.website-link:hover {
+		color: rgba(249, 250, 251, 0.8);
+	}
+</style>
+
+
+<div id="container">
+	<h1>ContestSubmission Invite</h1>
+	<div id="description" style="margin: 1em 0;">
+		<p>You have been invited to be part of the team <b>{teamName}</b> for the Contest <b>{contestName}</b>.</p>
+		<p>
+			If you don't have an account, you have to register first.
+			Otherwise, simply click on the join button below to join your colleagues.
+		</p>
+	</div>
+	<a id="join-button" href="{websiteUrl}/invite?jwt={jwt}">Join Contest</a>
+	<p style="margin-top: 1em"><small>For more information, see <a class="website-link" href="{websiteUrl}">{websiteName}</a></small></p>
+</div>

@@ -48,6 +48,11 @@ dependencies {
 	implementation("io.quarkus:quarkus-kubernetes-config")
 	// required because quarkus is too stupid to use multiple .properties files
 	implementation("io.quarkus:quarkus-config-yaml")
+	implementation("io.quarkus:quarkus-qute")
+	implementation("io.quarkus:quarkus-mailer")
+
+	quarkusDev("io.quarkiverse.mailpit:quarkus-mailpit:0.0.9")
+
 	testImplementation("io.quarkus:quarkus-junit5")
 	testImplementation("io.rest-assured:rest-assured")
 
@@ -55,7 +60,12 @@ dependencies {
 }
 
 group = "com.github.contestsubmission.backend"
-version = "2.7.3"
+version = "2.8.0"
+
+tasks.withType<JavaCompile> {
+	// required for qute - the templates utilize native methods that need to have their parameter names captured
+	options.compilerArgs.add("-parameters")
+}
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_21
