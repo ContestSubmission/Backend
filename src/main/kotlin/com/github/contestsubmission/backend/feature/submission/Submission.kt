@@ -12,6 +12,7 @@ class Submission {
 	var id: Long? = null
 
 	var url: String? = null
+	var fileName: String? = null
 	@ManyToOne
 	var uploadedBy: Person? = null
 	@ManyToOne

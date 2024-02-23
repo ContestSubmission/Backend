@@ -5,11 +5,14 @@ import com.github.contestsubmission.backend.feature.submission.Submission
 import com.github.contestsubmission.backend.feature.team.Team
 import com.github.contestsubmission.backend.feature.user.Person
 import java.time.LocalDateTime
+import java.util.*
 
 data class PersonalContestDTO(
+	val id: UUID,
 	val name: String,
 	val organizer: Person,
 	val description: String,
+	val publicGrading: Boolean,
 	val deadline: LocalDateTime,
 	val maxTeamSize: Int,
 	@JsonIgnoreProperties("contest")

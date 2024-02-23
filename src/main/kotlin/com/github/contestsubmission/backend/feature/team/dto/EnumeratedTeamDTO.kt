@@ -11,4 +11,15 @@ data class EnumeratedTeamDTO(
 	@field:Schema(defaultValue = "1")
 	val memberCount: Int,
 	val submissionCount: Int
-)
+) {
+	companion object {
+		fun toJPAQuery(teamColumn: String): String
+			= """NEW ${EnumeratedTeamDTO::class.qualifiedName}(
+				${teamColumn}.id,
+				${teamColumn}.name,
+				${teamColumn}.owner,
+				size(${teamColumn}.members),
+				size(${teamColumn}.submissions)
+			)""".trimIndent()
+	}
+}

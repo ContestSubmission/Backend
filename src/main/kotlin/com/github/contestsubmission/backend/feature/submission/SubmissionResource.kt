@@ -84,7 +84,8 @@ class SubmissionResource {
 		val jwt = Jwt.claims().apply {
 			subject(user.id.toString())
 			claim("team", team.id.toString())
-			claim("fileName", "$baseUrl/$fullFileName")
+			claim("uploadUrl", "$baseUrl/$fullFileName")
+			claim("fileName", fileName)
 			expiresIn(1.hours)
 		}.sign()
 
@@ -121,9 +122,9 @@ class SubmissionResource {
 			throw BadRequestException("Illegal request - mismatched team")
 		}
 
-		val fileName = jwt.claim<String>("fileName").orElseThrow { BadRequestException("Illegal request - invalid fileName") }
+		val uploadUrl = jwt.claim<String>("uploadUrl").orElseThrow { BadRequestException("Illegal request - invalid uploadUrl") }
 		val passedURL = URL(handInSubmissionDTO.url)
-		val uploadedURL = URL(fileName)
+		val uploadedURL = URL(uploadUrl)
 		val endpoint = URL(endpointOverride)
 		if (passedURL.file != uploadedURL.file || passedURL.host != endpoint.host || passedURL.port != endpoint.port) {
 			throw BadRequestException("Illegal request - mismatched file name or host. passedURL: $passedURL, uploadedURL: $uploadedURL, endpoint: $endpoint")
@@ -135,8 +136,11 @@ class SubmissionResource {
 			throw BadRequestException("Contest has already ended!")
 		}
 
+		val fileName = jwt.claim<String>("fileName").orElseThrow { BadRequestException("Invalid fileName") }
+
 		val submission = handInSubmissionDTO.toEntity().apply {
 			this.url = passedURL.toExternalForm()
+			this.fileName = fileName
 			this.team = team
 			this.handedInAt = now
 			this.uploadedBy = user

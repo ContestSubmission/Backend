@@ -42,9 +42,11 @@ class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
 		val personalContestDTO =  entityManager.createQuery(
 			"""
 				SELECT NEW com.github.contestsubmission.backend.feature.contest.dto.PersonalContestDTO(
+					c.id,
 					c.name,
 					c.organizer,
 					c.description,
+					c.publicGrading,
 					c.deadline,
 					c.maxTeamSize,
 					t

@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 
 data class ContestCreateDTO(
 	@field:NotBlank
-	@field:Schema(defaultValue = "My Contest")
+	@field:Schema(example = "My Contest")
 	val name: String,
 	val description: String? = null,
 	@field:Future
@@ -18,13 +18,15 @@ data class ContestCreateDTO(
 	@field:Max(50)
 	@field:Schema(example = "5")
 	val maxTeamSize: Int,
-	val public: Boolean = false
+	val public: Boolean = false,
+	val publicGrading: Boolean = false
 ) : ToEntityDTO<Contest> {
 	override fun toEntity() = Contest(
 		name = name,
 		description = description,
 		deadline = deadline,
 		maxTeamSize = maxTeamSize,
-		public = public
+		public = public,
+		publicGrading = publicGrading
 	)
 }
