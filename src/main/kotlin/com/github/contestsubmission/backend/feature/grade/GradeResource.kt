@@ -90,6 +90,6 @@ class GradeResource {
 			throw ForbiddenException("Not the organizer of the contest and public grading is disabled")
 		}
 
-		return gradeRepository.getByContest(contestId)
+		return gradeRepository.getByContest(contestId, caller.id)
 	}
 }

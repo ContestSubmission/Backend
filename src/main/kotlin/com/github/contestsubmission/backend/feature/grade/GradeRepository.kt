@@ -11,31 +11,36 @@ import java.util.UUID
 
 @ApplicationScoped
 class GradeRepository : CRUDRepository<Grade, GradeId>(Grade::class) {
-	fun getByContest(contestId: UUID): List<GradeTeamOverviewDTO> {
-		return entityManager.createQuery("""
+	fun getByContest(contestId: UUID, personId: UUID?): List<GradeTeamOverviewDTO> {
+		return entityManager.createQuery(
+			"""
 			SELECT ${EnumeratedTeamDTO.toJPAQuery("t")} AS team,
 				s AS submission,
 				COUNT(g.score) AS count,
-				COALESCE(SUM(g.score), 0) AS score
+				COALESCE(SUM(g.score), 0) AS score,
+				persGrade AS personalGrade
 			FROM Team t
 			LEFT JOIN t.submissions s
 			LEFT JOIN Grade g ON g.submission = s
+			LEFT JOIN Grade persGrade ON persGrade.submission = s AND persGrade.person.id = :personId
 			WHERE t.contest.id = :contestId
 				AND (s.handedInAt >= ALL(
 					SELECT sub.handedInAt
 					FROM Submission sub
 					WHERE sub.team = t
 				))
-			GROUP BY t, t.owner, g, g.submission, s
+			GROUP BY t, t.owner, s, persGrade
 		""".trimIndent(), Tuple::class.java)
 			.setParameter("contestId", contestId)
+			.setParameter("personId", personId)
 			.resultList
 			.map {
 				GradeTeamOverviewDTO(
-					it.getOrNull("submission", Submission::class.java),
-					it.get("team", EnumeratedTeamDTO::class.java),
-					it.get("count", Long::class.java),
-					it.get("score", Long::class.java)
+					submission = it.getOrNull("submission", Submission::class.java),
+					team = it.get("team", EnumeratedTeamDTO::class.java),
+					scoreCount = it.get("count", Long::class.java),
+					score = it.get("score", Long::class.java),
+					personalGrade = it.getOrNull("personalGrade", Grade::class.java)
 				)
 			}
 	}

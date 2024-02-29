@@ -29,4 +29,8 @@ class Grade(
 	var person: Person? = null
 ) {
 	constructor() : this(0, UUID.randomUUID(), 0, null)
+
+	override fun toString(): String {
+		return "Grade(submissionId=$submissionId, personId=$personId, score=$score, comment=$comment, submission=$submission, person=$person)"
+	}
 }

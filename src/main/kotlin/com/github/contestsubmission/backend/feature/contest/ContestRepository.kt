@@ -20,21 +20,36 @@ class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
 			.setParameter("term", "%$term%")
 			.resultList
 
-	fun findParticipatedContests(caller: Person): List<ParticipatedContestDTO> =
-		entityManager.createQuery("""
-			SELECT DISTINCT
-				NEW com.github.contestsubmission.backend.feature.contest.dto.ParticipatedContestDTO(
-					c.id,
-					c.name,
-					(c.organizer = :caller),
-					t
-			) FROM Contest c
-			LEFT JOIN c.teams t
-			LEFT JOIN t.members m
-			WHERE c.organizer = :caller OR m = :caller
+	fun findParticipatedContests(caller: Person): List<ParticipatedContestDTO> {
+		val contestsAsOrganizer = entityManager.createQuery("""
+			SELECT NEW com.github.contestsubmission.backend.feature.contest.dto.ParticipatedContestDTO(
+				c.id,
+				c.name,
+				true
+			)
+			FROM Contest c
+			WHERE c.organizer = :caller
 		""".trimIndent(), ParticipatedContestDTO::class.java)
 			.setParameter("caller", caller)
 			.resultList
+
+		val contestsAsParticipant = entityManager.createQuery("""
+			SELECT NEW com.github.contestsubmission.backend.feature.contest.dto.ParticipatedContestDTO(
+				c.id,
+				c.name,
+				false,
+				t
+			)
+			FROM Contest c
+			JOIN c.teams t
+			JOIN t.members m
+			WHERE m = :caller AND c.organizer != :caller
+		""".trimIndent(), ParticipatedContestDTO::class.java)
+			.setParameter("caller", caller)
+			.resultList
+
+		return contestsAsOrganizer + contestsAsParticipant
+	}
 
 	// cast from MutableList -> List
 	@Suppress("UNCHECKED_CAST", "kotlin:S6531")
