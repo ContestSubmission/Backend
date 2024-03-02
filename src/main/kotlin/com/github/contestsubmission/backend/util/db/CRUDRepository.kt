@@ -21,6 +21,12 @@ abstract class CRUDRepository<T : Any, I>(val entityClass: Class<T>) {
 		return entity
 	}
 
+	@Transactional
+	open fun merge(@Valid entity: T): T {
+		entityManager.merge(entity)
+		return entity
+	}
+
 	open fun findById(id: I): T? = entityManager.find(entityClass, id)
 }
 

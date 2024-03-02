@@ -12,9 +12,14 @@ class Submission {
 	var id: Long? = null
 
 	var url: String? = null
+	var fileName: String? = null
 	@ManyToOne
 	var uploadedBy: Person? = null
 	@ManyToOne
 	var team: Team? = null
 	var handedInAt: Instant = Instant.now()
+
+	override fun toString(): String {
+		return "Submission(id=$id, url=$url, fileName=$fileName, uploadedBy=$uploadedBy, team=$team, handedInAt=$handedInAt)"
+	}
 }

@@ -1,4 +1,4 @@
-package com.github.contestsubmission.backend.dev
+package com.github.contestsubmission.backend.setup
 
 import io.quarkus.runtime.StartupEvent
 import jakarta.enterprise.context.ApplicationScoped

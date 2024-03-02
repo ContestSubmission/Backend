@@ -12,5 +12,8 @@ data class ParticipatedContestDTO(
 	val manager: Boolean,
 	@JsonIgnoreProperties("contest", "members", "submissions")
 	@JsonInclude(Include.NON_NULL)
-	val team: Team?
-) : ContestDTO
+	val team: Team? = null
+) : ContestDTO {
+	// fuck you JPA
+	constructor(id: UUID, name: String, manager: Boolean) : this(id, name, manager, null)
+}
