@@ -22,6 +22,7 @@ import org.eclipse.microprofile.openapi.annotations.enums.SchemaType
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
+import java.time.LocalDateTime
 import java.util.*
 
 @Path("/contest")
@@ -81,6 +82,21 @@ class ContestResource : UriBuildable {
 		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
 
 		return contestRepository.getPersonalContest(caller, id) ?: throw NotFoundException("Contest not found")
+	}
+
+	@PUT
+	@Path("/{id}/endNow")
+	@Authenticated
+	fun endNow(@Valid id: UUID) {
+		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
+		val contest = contestRepository.findById(id) ?: throw NotFoundException("Contest not found")
+
+		if (contest.organizer != caller) {
+			throw UnauthorizedException("You are not the organizer of this contest")
+		}
+
+		contest.deadline = LocalDateTime.now()
+		contestRepository.merge(contest)
 	}
 
 	@GET
