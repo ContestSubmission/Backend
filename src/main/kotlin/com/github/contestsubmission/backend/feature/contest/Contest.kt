@@ -24,7 +24,7 @@ class Contest(
 	var description: String? = null,
 	var public: Boolean = false,
 	var publicGrading: Boolean = false,
-	var deadline: LocalDateTime = LocalDateTime.now().plusDays(7),
+	override var deadline: LocalDateTime = LocalDateTime.now().plusDays(7),
 	var maxTeamSize: Int = 1,
 	@OneToMany(mappedBy = "contest", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
 	@JsonIgnoreProperties("contest")

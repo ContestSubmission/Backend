@@ -25,6 +25,7 @@ class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
 			SELECT NEW com.github.contestsubmission.backend.feature.contest.dto.ParticipatedContestDTO(
 				c.id,
 				c.name,
+				c.deadline,
 				true
 			)
 			FROM Contest c
@@ -37,6 +38,7 @@ class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
 			SELECT NEW com.github.contestsubmission.backend.feature.contest.dto.ParticipatedContestDTO(
 				c.id,
 				c.name,
+				c.deadline,
 				false,
 				t
 			)
