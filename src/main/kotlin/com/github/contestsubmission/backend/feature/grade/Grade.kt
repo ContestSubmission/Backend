@@ -2,12 +2,7 @@ package com.github.contestsubmission.backend.feature.grade
 
 import com.github.contestsubmission.backend.feature.submission.Submission
 import com.github.contestsubmission.backend.feature.user.Person
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.IdClass
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.MapsId
+import jakarta.persistence.*
 import java.util.*
 
 @Entity
@@ -22,9 +17,11 @@ class Grade(
 	var score: Int,
 	var comment: String?,
 	@MapsId("submissionId")
+	@JoinColumn(name = "submission_id")
 	@ManyToOne
 	var submission: Submission? = null,
 	@MapsId("personId")
+	@JoinColumn(name = "person_id")
 	@ManyToOne
 	var person: Person? = null
 ) {

@@ -60,7 +60,7 @@ dependencies {
 }
 
 group = "com.github.contestsubmission.backend"
-version = "3.0.0"
+version = "3.1.0"
 
 tasks.withType<JavaCompile> {
 	// required for qute - the templates utilize native methods that need to have their parameter names captured
