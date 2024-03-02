@@ -1,9 +1,12 @@
+import io.github.simulatan.gradle.plugin.buildinfo.configuration.BuildInfoExtension
+import io.github.simulatan.gradle.plugin.buildinfo.configuration.PropertiesOutputLocation
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 	kotlin("jvm") version "1.9.22"
 	kotlin("plugin.allopen") version "1.9.22"
 	kotlin("plugin.jpa") version "1.9.22"
+	id("io.github.simulatan.gradle-buildinfo-plugin") version "2.1.0"
 	id("io.quarkus")
 }
 
@@ -60,7 +63,30 @@ dependencies {
 }
 
 group = "com.github.contestsubmission.backend"
-version = "3.1.1"
+version = "3.2.0"
+
+buildInfo {
+	this.gitInfoMode = BuildInfoExtension.MODE_ERROR
+	this.propertiesOutputs = listOf(PropertiesOutputLocation { project ->
+		listOf(project.layout.buildDirectory.get().file("buildinfo.properties").asFile)
+	})
+	this.extraAttribute("Version", version)
+	this.extraAttribute("Application", rootProject.name)
+}
+
+tasks.register("copyBuildInfoToJar", Copy::class) {
+	group = "build"
+	description = "Copies build info to resources"
+	dependsOn(tasks.buildInfo)
+	from("build/buildinfo.properties")
+	into("build/resources/main")
+}
+
+listOf(tasks.jar, tasks.quarkusDependenciesBuild, tasks.quarkusDev, tasks.imageBuild)
+	.map(TaskProvider<out Task>::get)
+	.forEach {
+		it.dependsOn(tasks.getByName("copyBuildInfoToJar"))
+	}
 
 tasks.withType<JavaCompile> {
 	// required for qute - the templates utilize native methods that need to have their parameter names captured
