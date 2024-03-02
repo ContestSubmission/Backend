@@ -82,7 +82,7 @@ tasks.register("copyBuildInfoToJar", Copy::class) {
 	into("build/resources/main")
 }
 
-listOf(tasks.jar, tasks.quarkusDependenciesBuild, tasks.quarkusDev)
+listOf(tasks.jar, tasks.quarkusDependenciesBuild, tasks.quarkusDev, tasks.imageBuild)
 	.map(TaskProvider<out Task>::get)
 	.forEach {
 		it.dependsOn(tasks.getByName("copyBuildInfoToJar"))
