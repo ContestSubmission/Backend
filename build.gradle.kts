@@ -63,7 +63,7 @@ dependencies {
 }
 
 group = "com.github.contestsubmission.backend"
-version = "3.1.0"
+version = "3.1.1"
 
 buildInfo {
 	this.gitInfoMode = BuildInfoExtension.MODE_ERROR
