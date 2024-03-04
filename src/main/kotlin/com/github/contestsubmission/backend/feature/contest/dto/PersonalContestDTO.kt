@@ -11,7 +11,7 @@ data class PersonalContestDTO(
 	val id: UUID,
 	val name: String,
 	val organizer: Person,
-	val description: String,
+	val description: String?,
 	val publicGrading: Boolean,
 	val deadline: LocalDateTime,
 	val maxTeamSize: Int,
