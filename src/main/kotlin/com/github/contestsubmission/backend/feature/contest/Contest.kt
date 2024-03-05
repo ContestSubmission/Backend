@@ -22,7 +22,7 @@ class Contest(
 	@JoinColumn(nullable = false)
 	var organizer: Person? = Person(),
 	var description: String? = null,
-	var public: Boolean = false,
+	var publicAccessible: Boolean = false,
 	var publicGrading: Boolean = false,
 	override var deadline: LocalDateTime = LocalDateTime.now().plusDays(7),
 	var maxTeamSize: Int = 1,
