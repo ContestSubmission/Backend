@@ -12,10 +12,11 @@ import java.util.*
 class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
 
 	fun search(term: String): MutableList<Contest>? =
-		entityManager.createQuery("""
+		entityManager.createQuery(
+			"""
 			SELECT c FROM Contest c WHERE
 				(lower(c.name) LIKE lower(:term) OR lower(c.description) LIKE lower(:term))
-				AND c.public
+				AND c.publicAccessible
 		""".trimIndent(), Contest::class.java)
 			.setParameter("term", "%$term%")
 			.resultList
@@ -71,11 +72,11 @@ class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
 				FROM Contest c
 				LEFT JOIN c.teams t
 				LEFT JOIN FETCH t.members m
-				WHERE c.id = :contestId AND (c.organizer = :caller OR m = :caller)
+				WHERE c.id = :contestId AND (c.organizer.id = :callerId OR m.id = :callerId)
 			""".trimIndent(),
 			PersonalContestDTO::class.java
 		)
-			.setParameter("caller", caller)
+			.setParameter("callerId", caller.id)
 			.setParameter("contestId", contestId)
 			.resultList
 			.firstOrNull()

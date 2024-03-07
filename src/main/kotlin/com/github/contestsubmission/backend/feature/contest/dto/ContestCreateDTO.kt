@@ -10,7 +10,7 @@ data class ContestCreateDTO(
 	@field:NotBlank
 	@field:Schema(example = "My Contest")
 	val name: String,
-	val description: String? = null,
+	val description: String?,
 	@field:Future
 	@field:Schema(example = "2025-05-10T00:00:00")
 	val deadline: LocalDateTime,
@@ -18,15 +18,15 @@ data class ContestCreateDTO(
 	@field:Max(50)
 	@field:Schema(example = "5")
 	val maxTeamSize: Int,
-	val public: Boolean = false,
-	val publicGrading: Boolean = false
+	val publicAccessible: Boolean,
+	val publicGrading: Boolean
 ) : ToEntityDTO<Contest> {
 	override fun toEntity() = Contest(
 		name = name,
 		description = description,
 		deadline = deadline,
 		maxTeamSize = maxTeamSize,
-		public = public,
+		publicAccessible = publicAccessible,
 		publicGrading = publicGrading
 	)
 }
