@@ -57,7 +57,7 @@ class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
 	// cast from MutableList -> List
 	@Suppress("UNCHECKED_CAST", "kotlin:S6531")
 	fun getPersonalContest(caller: Person, contestId: UUID): PersonalContestDTO? {
-		val personalContestDTO =  entityManager.createQuery(
+		val personalContestDTO = entityManager.createQuery(
 			"""
 				SELECT NEW com.github.contestsubmission.backend.feature.contest.dto.PersonalContestDTO(
 					c.id,
@@ -70,20 +70,17 @@ class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
 					t
 				)
 				FROM Contest c
-				LEFT JOIN c.teams t
-				LEFT JOIN FETCH t.members m
-				WHERE c.id = :contestId AND (c.organizer.id = :callerId OR m.id = :callerId)
+				LEFT JOIN c.teams t ON :caller MEMBER OF t.members
+				WHERE c.id = :contestId
 			""".trimIndent(),
 			PersonalContestDTO::class.java
 		)
-			.setParameter("callerId", caller.id)
+			.setParameter("caller", caller)
 			.setParameter("contestId", contestId)
 			.resultList
 			.firstOrNull()
-			// epic hack to make sure that the team is null if the caller is the organizer
-			// this tells the client that the user cannot submit something
-			?.run { if (organizer == caller) copy(team = null) else this }
 
+		// user isn't in a team => no submissions
 		if (personalContestDTO?.team == null) return personalContestDTO
 
 		val submissions: List<Submission> = entityManager.createQuery(
