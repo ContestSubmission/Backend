@@ -49,6 +49,10 @@ class TeamInviteResource {
 				.build()
 		}
 
+		if (!teamRepository.canJoinTeam(team.contest, person)) {
+			return Response.status(Response.Status.CONFLICT).entity("User cannot join a team!").build()
+		}
+
 		teamRepository.addUserToTeam(person, team)
 
 		return Response.noContent().build()

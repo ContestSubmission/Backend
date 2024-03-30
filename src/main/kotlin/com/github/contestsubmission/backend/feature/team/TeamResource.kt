@@ -53,9 +53,18 @@ class TeamResource : UriBuildable {
 			mediaType = MediaType.APPLICATION_JSON, schema = Schema(implementation = Team::class)
 		)]
 	)
+	@APIResponse(
+		responseCode = "409", description = "User cannot create a team", content = [Content(
+			mediaType = MediaType.TEXT_PLAIN
+		)]
+	)
 	fun create(@Valid teamCreateDTO: TeamCreateDTO): Response {
 		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
 		val contest = contestRepository.findById(contestId) ?: throw NotFoundException("Contest not found")
+
+		if (!teamRepository.canJoinTeam(contest, caller)) {
+			return Response.status(Response.Status.CONFLICT).entity("User cannot create a team!").build()
+		}
 
 		val team = teamCreateDTO.toEntity()
 		team.contest = contest
