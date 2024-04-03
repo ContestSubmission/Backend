@@ -192,29 +192,22 @@ jobs:
           node-version: "20.x"
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Download package-template
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docs/api-client/package-template.json
+          sparse-checkout-cone-mode: false
+
       - name: Write package.json file
         run: |
           if ! npx semver "${{ github.ref_name }}"; then
-            VERSION_SUFFIX="+${{ github.run_number }}"
+            VERSION_SUFFIX="-${{ github.run_number }}"
           fi
           VERSION="${{ needs.build.outputs.application_version }}$VERSION_SUFFIX"
 
           echo "Writing package.json for version $VERSION"
-          cat <<EOF > package.json
-          {
-            "name": "@contestsubmission/api-client",
-            "version": "$VERSION",
-            "repository": {
-              "type": "git",
-              "url": "git+https://github.com/ContestSubmission/Backend.git"
-            },
-            "license": "MIT",
-            "bugs": {
-              "url": "https://github.com/ContestSubmission/Backend/issues"
-            },
-            "homepage": "https://github.com/ContestSubmission/Backend#readme"
-          }
-          EOF
+          sed 's/$VERSION/'"$VERSION"'/g' docs/api-client/package-template.json > package.json
 
       - name: Publish client to npm
         run: |
