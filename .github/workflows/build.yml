@@ -81,8 +81,8 @@ jobs:
           application_version="$(./gradlew properties -q | awk '/^version:/ {print $2}')"
           echo "application_version=$application_version" \
             >> "$GITHUB_OUTPUT"
-          # unique version like `2.6.1+69` - immutable
-          full_version="$application_version+${{github.run_number}}"
+          # unique version like `2.6.1-69` - immutable
+          full_version="$application_version-${{github.run_number}}"
           echo "full_version=$full_version" \
             >> "$GITHUB_OUTPUT"
 
