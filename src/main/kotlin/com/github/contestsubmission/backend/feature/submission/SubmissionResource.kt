@@ -20,7 +20,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty
 import software.amazon.awssdk.regions.Region
 import java.net.URL
 import java.time.Clock.systemUTC
-import java.time.Instant.now
+import java.time.Instant
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -59,12 +59,10 @@ class SubmissionResource {
 		val user = userAuthenticationService.getUser() ?: throw UnauthorizedException("You are not logged in!")
 		val team = userAuthenticationService.getTeam(teamId, contestId)
 
-		val now = now(systemUTC())
-
-		if (now >= team.contest.deadline.toInstant(UTC)) {
+		if (team.contest.hasEnded()) {
 			throw BadRequestException("Contest has already ended!")
 		}
-
+		val now = Instant.now(systemUTC())
 		val oneMinuteFromNow: ZonedDateTime = now.plusSeconds(60).atZone(UTC)
 		val fullFileName = "submissions/${contestId}/${team.id}/${DateTimeFormatter.ISO_DATE_TIME.withZone(UTC).format(now)}_$fileName"
 		val postParams = PostParams
@@ -130,12 +128,11 @@ class SubmissionResource {
 			throw BadRequestException("Illegal request - mismatched file name or host. passedURL: $passedURL, uploadedURL: $uploadedURL, endpoint: $endpoint")
 		}
 
-		val now = now(systemUTC())
-
-		if (now >= team.contest.deadline.toInstant(UTC)) {
+		if (team.contest.hasEnded()) {
 			throw BadRequestException("Contest has already ended!")
 		}
 
+		val now = Instant.now(systemUTC())
 		val fileName = jwt.claim<String>("fileName").orElseThrow { BadRequestException("Invalid fileName") }
 
 		val submission = handInSubmissionDTO.toEntity().apply {

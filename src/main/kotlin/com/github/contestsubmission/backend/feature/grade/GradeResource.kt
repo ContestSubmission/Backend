@@ -14,17 +14,16 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.hibernate.validator.HibernateValidatorFactory
-import java.time.LocalDateTime
 import java.util.*
 
 
 @Path("/contest/{contestId}/grade")
 class GradeResource {
 	@PathParam("contestId")
-	protected lateinit var contestId: UUID
+	lateinit var contestId: UUID
 
 	@Inject
-	protected lateinit var gradeRepository: GradeRepository
+	lateinit var gradeRepository: GradeRepository
 
 	@Inject
 	lateinit var contestRepository: ContestRepository
@@ -51,7 +50,7 @@ class GradeResource {
 			return Response.status(Response.Status.FORBIDDEN).entity("Not the organizer of the contest and public grading is disabled").build()
 		}
 
-		if (LocalDateTime.now().isBefore(contest.deadline)) {
+		if (!contest.hasEnded()) {
 			return Response.status(Response.Status.BAD_REQUEST).entity("Contest is still in progress!").build()
 		}
 

@@ -22,7 +22,7 @@ import org.eclipse.microprofile.openapi.annotations.enums.SchemaType
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.*
 
 @Path("/contest")
@@ -95,7 +95,7 @@ class ContestResource : UriBuildable {
 			throw UnauthorizedException("You are not the organizer of this contest")
 		}
 
-		contest.deadline = LocalDateTime.now()
+		contest.deadline = Instant.now()
 		contestRepository.merge(contest)
 	}
 
