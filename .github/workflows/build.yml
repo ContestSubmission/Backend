@@ -176,6 +176,13 @@ jobs:
     needs: build
     if: ${{ github.ref_name == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/') }}
     steps:
+      - name: Download package-template
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docs/api-client/package-template.json
+          sparse-checkout-cone-mode: false
+
       - uses: actions/download-artifact@v3
         with:
           name: openapi-spec
@@ -194,27 +201,13 @@ jobs:
 
       - name: Write package.json file
         run: |
-          if [[ "$GITHUB_REF" != "refs/tags/"* ]] || [[ "${{ needs.build.outputs.branch }}" != "${{ github.event.repository.default_branch }}" ]]; then
-            VERSION_SUFFIX="-SNAPSHOT.${{ github.run_number }}"
+          if ! npx semver "${{ github.ref_name }}"; then
+            VERSION_SUFFIX="-${{ github.run_number }}"
           fi
           VERSION="${{ needs.build.outputs.application_version }}$VERSION_SUFFIX"
 
           echo "Writing package.json for version $VERSION"
-          cat <<EOF > package.json
-          {
-            "name": "@contestsubmission/api-client",
-            "version": "$VERSION",
-            "repository": {
-              "type": "git",
-              "url": "git+https://github.com/ContestSubmission/Backend.git"
-            },
-            "license": "MIT",
-            "bugs": {
-              "url": "https://github.com/ContestSubmission/Backend/issues"
-            },
-            "homepage": "https://github.com/ContestSubmission/Backend#readme"
-          }
-          EOF
+          sed 's/$VERSION/'"$VERSION"'/g' docs/api-client/package-template.json > package.json
 
       - name: Publish client to npm
         run: |
