@@ -85,8 +85,8 @@ class GradeResource {
 		val contest = contestRepository.findById(contestId) ?: throw NotFoundException("Contest not found")
 
 		// will be replaced by RBAC in the future
-		if (contest.organizer?.id?.equals(caller.id) != true && !contest.publicGrading) {
-			throw ForbiddenException("Not the organizer of the contest and public grading is disabled")
+		if (contest.organizer?.id?.equals(caller.id) != true && (!contest.publicGrading || !contest.hasEnded())) {
+			throw ForbiddenException("Not the organizer of the contest and public grading is disabled or contest is in progress")
 		}
 
 		return gradeRepository.getByContest(contestId, caller.id)
