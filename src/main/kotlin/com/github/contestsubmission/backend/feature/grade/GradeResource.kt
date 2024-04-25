@@ -5,9 +5,10 @@ import com.github.contestsubmission.backend.feature.grade.dto.GradeCreateDTO
 import com.github.contestsubmission.backend.feature.grade.dto.GradeTeamOverviewDTO
 import com.github.contestsubmission.backend.feature.submission.SubmissionRepository
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
+import com.github.contestsubmission.backend.util.findById
 import com.github.contestsubmission.backend.util.tryValidate
+import getUser
 import io.quarkus.security.Authenticated
-import io.quarkus.security.UnauthorizedException
 import jakarta.inject.Inject
 import jakarta.validation.ValidatorFactory
 import jakarta.ws.rs.*
@@ -42,16 +43,16 @@ class GradeResource {
 	@Authenticated
 	@APIResponse(responseCode = "201", description = "Grade created")
 	fun grade(@PathParam("submissionId") submissionId: Long, gradeCreateDTO: GradeCreateDTO): Response {
-		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
-		val contest = contestRepository.findById(contestId) ?: throw NotFoundException("Contest not found")
+		val caller = userAuthenticationService.getUser()
+		val contest = contestRepository.findById(contestId)
 
 		// will be replaced by RBAC in the future
 		if (contest.organizer?.id?.equals(caller.id) != true && !contest.publicGrading) {
-			return Response.status(Response.Status.FORBIDDEN).entity("Not the organizer of the contest and public grading is disabled").build()
+			throw ForbiddenException("Not the organizer of the contest and public grading is disabled")
 		}
 
 		if (!contest.hasEnded()) {
-			return Response.status(Response.Status.BAD_REQUEST).entity("Contest is still in progress!").build()
+			throw BadRequestException("Contest is still in progress")
 		}
 
 		val validator = validatorFactory.unwrap(HibernateValidatorFactory::class.java)
@@ -62,7 +63,7 @@ class GradeResource {
 		validator.tryValidate(gradeCreateDTO)
 
 		if (!submissionRepository.isLatestSubmission(submissionId)) {
-			return Response.status(Response.Status.BAD_REQUEST).entity("Outdated submission").build()
+			throw BadRequestException("Outdated submission")
 		}
 
 		val grade = Grade(
@@ -81,8 +82,8 @@ class GradeResource {
 	@Path("list")
 	@Authenticated
 	fun list(): List<GradeTeamOverviewDTO> {
-		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
-		val contest = contestRepository.findById(contestId) ?: throw NotFoundException("Contest not found")
+		val caller = userAuthenticationService.getUser()
+		val contest = contestRepository.findById(contestId)
 
 		// will be replaced by RBAC in the future
 		if (contest.organizer?.id?.equals(caller.id) != true && (!contest.publicGrading || !contest.hasEnded())) {

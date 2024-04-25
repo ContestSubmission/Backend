@@ -36,4 +36,8 @@ class Contest(
 	fun hasEnded(): Boolean {
 		return Instant.now() > deadline
 	}
+
+	companion object {
+		const val ENTITY_NAME = "Contest"
+	}
 }

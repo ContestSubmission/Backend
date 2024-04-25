@@ -24,4 +24,8 @@ class Submission {
 	override fun toString(): String {
 		return "Submission(id=$id, url=$url, fileName=$fileName, uploadedBy=$uploadedBy, team=$team, handedInAt=$handedInAt, contentType=$contentType)"
 	}
+
+	companion object {
+		const val ENTITY_NAME = "Submission"
+	}
 }

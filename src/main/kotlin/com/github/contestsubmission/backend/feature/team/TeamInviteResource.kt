@@ -3,9 +3,10 @@ package com.github.contestsubmission.backend.feature.team
 import com.github.contestsubmission.backend.feature.mail.MailerService
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
 import com.github.contestsubmission.backend.util.expiresIn
+import com.github.contestsubmission.backend.util.findById
 import com.github.contestsubmission.backend.util.toUUID
+import getUser
 import io.quarkus.security.Authenticated
-import io.quarkus.security.UnauthorizedException
 import io.smallrye.jwt.auth.principal.JWTParser
 import io.smallrye.jwt.build.Jwt
 import jakarta.inject.Inject
@@ -35,22 +36,19 @@ class TeamInviteResource {
 		val jwt = jwtParser.parse(invite)
 		val teamId = jwt.getClaim<String>("teamId").toUUID() ?: throw InternalServerErrorException("JWT contains invalid UUID!")
 		val team = teamRepository.findById(teamId)
-			?: throw NotFoundException("Team not found")
 
 		if (team.members.size >= team.contest.maxTeamSize) {
-			return Response.status(Response.Status.BAD_REQUEST).entity("Team is already full!").build()
+			throw BadRequestException("Team is already full")
 		}
 
-		val person = userAuthenticationService.getUser() ?: throw UnauthorizedException("You are not logged in!")
+		val person = userAuthenticationService.getUser()
 
 		if (jwt.subject != userAuthenticationService.getEmail()) {
-			return Response.status(Response.Status.BAD_REQUEST)
-				.entity("Mismatched mail address - make sure your primary mail is the same as the invited one!")
-				.build()
+			throw BadRequestException("Mismatched mail address - make sure your primary mail is the same as the invited one!")
 		}
 
 		if (!teamRepository.canJoinTeam(team.contest, person)) {
-			return Response.status(Response.Status.CONFLICT).entity("User cannot join a team!").build()
+			throw WebApplicationException("User cannot join a team!", Response.Status.CONFLICT)
 		}
 
 		teamRepository.addUserToTeam(person, team)
@@ -65,8 +63,8 @@ class TeamInviteResource {
 	@POST
 	@Authenticated
 	fun create(@PathParam("contestId") @NotNull contestId: UUID, @PathParam("teamId") @NotNull teamId: UUID, @RestQuery("email") @NotNull email: String): Response {
-		val person = userAuthenticationService.getUser() ?: throw UnauthorizedException("You are not logged in!")
-		val team = teamRepository.findById(teamId) ?: throw NotFoundException("Team not found")
+		val person = userAuthenticationService.getUser()
+		val team = teamRepository.findById(teamId)
 		if (team.contest.id != contestId) {
 			throw NotFoundException("Team not found")
 		}

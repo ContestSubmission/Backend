@@ -6,10 +6,11 @@ import com.github.contestsubmission.backend.feature.team.dto.TeamCreateDTO
 import com.github.contestsubmission.backend.feature.team.dto.TeamGetDTO
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
 import com.github.contestsubmission.backend.util.db.findByIdFullFetch
+import com.github.contestsubmission.backend.util.findById
 import com.github.contestsubmission.backend.util.rest.UriBuildable
 import com.github.contestsubmission.backend.util.rest.response
+import getUser
 import io.quarkus.security.Authenticated
-import io.quarkus.security.UnauthorizedException
 import io.smallrye.common.annotation.Blocking
 import io.smallrye.common.annotation.RunOnVirtualThread
 import jakarta.inject.Inject
@@ -59,11 +60,11 @@ class TeamResource : UriBuildable {
 		)]
 	)
 	fun create(@Valid teamCreateDTO: TeamCreateDTO): Response {
-		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
-		val contest = contestRepository.findById(contestId) ?: throw NotFoundException("Contest not found")
+		val caller = userAuthenticationService.getUser()
+		val contest = contestRepository.findById(contestId)
 
 		if (!teamRepository.canJoinTeam(contest, caller)) {
-			return Response.status(Response.Status.CONFLICT).entity("User cannot create a team!").build()
+			throw WebApplicationException("User cannot create a team", Response.Status.CONFLICT)
 		}
 
 		val team = teamCreateDTO.toEntity()
@@ -81,8 +82,8 @@ class TeamResource : UriBuildable {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Authenticated
 	fun list(): List<EnumeratedTeamDTO> {
-		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
-		val contest = contestRepository.findById(contestId) ?: throw NotFoundException("Contest not found")
+		val caller = userAuthenticationService.getUser()
+		val contest = contestRepository.findById(contestId)
 		// will be replaced by role-based authorization later
 		if (caller.id == contest.organizer?.id) {
 			return teamRepository.listByContest(contest)
@@ -96,7 +97,7 @@ class TeamResource : UriBuildable {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Authenticated
 	fun get(@PathParam("teamId") teamId: UUID): TeamGetDTO {
-		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
+		val caller = userAuthenticationService.getUser()
 		val team = teamRepository.findByIdFullFetch(teamId) ?: throw NotFoundException("Team not found")
 
 		if (team.contest.id != contestId) {

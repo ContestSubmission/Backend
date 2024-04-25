@@ -11,6 +11,8 @@ import java.util.UUID
 
 @ApplicationScoped
 class GradeRepository : CRUDRepository<Grade, GradeId>(Grade::class) {
+	override val entityName = Grade.ENTITY_NAME
+
 	fun getByContest(contestId: UUID, personId: UUID?): List<GradeTeamOverviewDTO> {
 		return entityManager.createQuery(
 			"""

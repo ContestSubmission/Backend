@@ -2,6 +2,8 @@ package com.github.contestsubmission.backend.feature.user
 
 import com.github.contestsubmission.backend.feature.team.Team
 import com.github.contestsubmission.backend.feature.team.TeamRepository
+import com.github.contestsubmission.backend.util.entityNotFound
+import com.github.contestsubmission.backend.util.findById
 import com.github.contestsubmission.backend.util.toUUID
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.RequestScoped
@@ -17,13 +19,13 @@ class UserAuthenticationService {
 	protected lateinit var userRepository: PersonRepository
 
 	fun getOrCreatePerson(callerId: UUID): Person? {
-		return userRepository.findById(callerId) ?: createUser(Person(callerId))
+		return userRepository.findByIdOrNull(callerId) ?: createUser(Person(callerId))
 	}
 
 	@Inject
 	protected lateinit var jwt: JsonWebToken
 
-	fun getUser(): Person? = getOrCreatePerson(getUUID())
+	fun getUserOrNull(): Person? = getOrCreatePerson(getUUID())
 
 	fun getUUID() = jwt.claim<String>("sub").orElseThrow { IllegalStateException("JWT does not contain an id") }
 		.toUUID() ?: throw IllegalStateException("id is not a valid UUID")
@@ -39,12 +41,12 @@ class UserAuthenticationService {
 	protected lateinit var teamRepository: TeamRepository
 
 	fun getTeam(teamId: UUID, contestId: UUID? = null): Team {
-		val user = getUser() ?: throw NotFoundException("User not found")
+		val user = getUserOrNull() ?: throw NotFoundException("User not found")
 
-		val team = teamRepository.findById(teamId) ?: throw NotFoundException("Team not found")
+		val team = teamRepository.findById(teamId)
 
 		if (contestId != null && team.contest.id != contestId) {
-			throw NotFoundException("Team not found")
+			throw NotFoundException(entityNotFound(Team.ENTITY_NAME))
 		}
 
 		if (!team.members.contains(user)) {

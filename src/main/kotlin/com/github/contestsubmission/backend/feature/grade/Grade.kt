@@ -30,4 +30,8 @@ class Grade(
 	override fun toString(): String {
 		return "Grade(submissionId=$submissionId, personId=$personId, score=$score, comment=$comment, submission=$submission, person=$person)"
 	}
+
+	companion object {
+		const val ENTITY_NAME = "Grade"
+	}
 }

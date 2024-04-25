@@ -5,8 +5,11 @@ import com.github.contestsubmission.backend.feature.contest.dto.ParticipatedCont
 import com.github.contestsubmission.backend.feature.contest.dto.PersonalContestDTO
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
 import com.github.contestsubmission.backend.util.db.findByIdFullFetch
+import com.github.contestsubmission.backend.util.findById
 import com.github.contestsubmission.backend.util.rest.UriBuildable
 import com.github.contestsubmission.backend.util.rest.response
+import com.github.contestsubmission.backend.util.getPersonalContest
+import getUser
 import io.quarkus.security.Authenticated
 import io.quarkus.security.UnauthorizedException
 import io.smallrye.common.annotation.Blocking
@@ -48,9 +51,10 @@ class ContestResource : UriBuildable {
 		)]
 	)
 	fun createContest(@Valid contestCreateDTO: ContestCreateDTO): Response {
-		val caller = userAuthenticationService.getUser() ?: return Response.status(Response.Status.UNAUTHORIZED).build()
+		val caller = userAuthenticationService.getUser()
 		val contest = contestCreateDTO.toEntity()
 		contest.organizer = caller
+
 
 		return contestRepository.persist(contest).response {
 			header("Location", contest.id.toUri())
@@ -79,17 +83,17 @@ class ContestResource : UriBuildable {
 	)
 	@Authenticated
 	fun getPersonalContest(@Valid id: UUID): PersonalContestDTO {
-		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
+		val caller = userAuthenticationService.getUser()
 
-		return contestRepository.getPersonalContest(caller, id) ?: throw NotFoundException("Contest not found")
+		return contestRepository.getPersonalContest(caller, id)
 	}
 
 	@PUT
 	@Path("/{id}/endNow")
 	@Authenticated
 	fun endNow(@Valid id: UUID) {
-		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
-		val contest = contestRepository.findById(id) ?: throw NotFoundException("Contest not found")
+		val caller = userAuthenticationService.getUser()
+		val contest = contestRepository.findById(id)
 
 		if (contest.organizer != caller) {
 			throw UnauthorizedException("You are not the organizer of this contest")
@@ -114,7 +118,7 @@ class ContestResource : UriBuildable {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Authenticated
 	fun myContests(): List<ParticipatedContestDTO> {
-		val caller = userAuthenticationService.getUser() ?: throw UnauthorizedException("Not logged in")
+		val caller = userAuthenticationService.getUser()
 
 		return contestRepository.findParticipatedContests(caller)
 	}

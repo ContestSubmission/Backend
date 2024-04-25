@@ -25,4 +25,8 @@ class Person(
 	override fun hashCode(): Int {
 		return id?.hashCode() ?: 0
 	}
+
+	companion object {
+		const val ENTITY_NAME = "Person"
+	}
 }

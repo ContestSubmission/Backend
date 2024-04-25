@@ -11,6 +11,8 @@ import java.util.*
 
 @ApplicationScoped
 class TeamRepository : CRUDRepository<Team, UUID>(Team::class.java) {
+	override val entityName = Team.ENTITY_NAME
+
 	fun listByContest(contest: Contest): List<EnumeratedTeamDTO> =
 		entityManager.createQuery("SELECT NEW com.github.contestsubmission.backend.feature.team.dto.EnumeratedTeamDTO(t.id, t.name, t.owner, size(t.members), size(t.submissions)) FROM Team t WHERE t.contest = :contest", EnumeratedTeamDTO::class.java)
 			.setParameter("contest", contest)

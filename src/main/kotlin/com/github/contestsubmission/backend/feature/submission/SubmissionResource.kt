@@ -4,11 +4,11 @@ import com.github.contestsubmission.backend.feature.submission.dto.HandInSubmiss
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
 import com.github.contestsubmission.backend.util.expiresIn
 import com.github.contestsubmission.backend.util.toUUID
+import getUser
 import io.github.dyegosutil.awspresignedpost.conditions.key.ExactKeyCondition
 import io.github.dyegosutil.awspresignedpost.postparams.PostParams
 import io.github.dyegosutil.awspresignedpost.signer.S3PostSigner
 import io.quarkus.security.Authenticated
-import io.quarkus.security.UnauthorizedException
 import io.smallrye.jwt.auth.principal.JWTParser
 import io.smallrye.jwt.build.Jwt
 import jakarta.inject.Inject
@@ -18,7 +18,7 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import software.amazon.awssdk.regions.Region
-import java.net.URL
+import java.net.URI
 import java.time.Clock.systemUTC
 import java.time.Instant
 import java.time.ZoneOffset.UTC
@@ -56,7 +56,7 @@ class SubmissionResource {
 	@Authenticated
 	@Produces(MediaType.APPLICATION_JSON)
 	fun create(@QueryParam("fileName") @NotNull @NotBlank fileName: String, @QueryParam("contentType") @NotNull @NotBlank contentType: String): PreSignedPost? {
-		val user = userAuthenticationService.getUser() ?: throw UnauthorizedException("You are not logged in!")
+		val user = userAuthenticationService.getUser()
 		val team = userAuthenticationService.getTeam(teamId, contestId)
 
 		if (team.contest.hasEnded()) {
@@ -104,7 +104,7 @@ class SubmissionResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	fun submit(handInSubmissionDTO: HandInSubmissionDTO): Submission {
-		val user = userAuthenticationService.getUser() ?: throw UnauthorizedException("You are not logged in!")
+		val user = userAuthenticationService.getUser()
 		val team = userAuthenticationService.getTeam(teamId, contestId)
 
 		val jwt = try {
@@ -123,9 +123,9 @@ class SubmissionResource {
 		}
 
 		val uploadUrl = jwt.claim<String>("uploadUrl").orElseThrow { BadRequestException("Illegal request - invalid uploadUrl") }
-		val passedURL = URL(handInSubmissionDTO.url)
-		val uploadedURL = URL(uploadUrl)
-		val endpoint = URL(endpointOverride)
+		val passedURL = URI(handInSubmissionDTO.url).toURL()
+		val uploadedURL = URI(uploadUrl).toURL()
+		val endpoint = URI(endpointOverride).toURL()
 		if (passedURL.file != uploadedURL.file || passedURL.host != endpoint.host || passedURL.port != endpoint.port) {
 			throw BadRequestException("Illegal request - mismatched file name or host. passedURL: $passedURL, uploadedURL: $uploadedURL, endpoint: $endpoint")
 		}

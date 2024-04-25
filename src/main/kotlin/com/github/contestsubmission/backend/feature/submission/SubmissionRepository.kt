@@ -6,6 +6,8 @@ import java.util.*
 
 @ApplicationScoped
 class SubmissionRepository : CRUDRepository<Submission, UUID>(Submission::class) {
+	override val entityName = Submission.ENTITY_NAME
+
 	fun isLatestSubmission(submissionId: Long): Boolean =
 		entityManager.createQuery(
 			"""

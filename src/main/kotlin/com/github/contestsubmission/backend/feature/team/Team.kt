@@ -31,4 +31,8 @@ class Team(
 	var submissions: MutableSet<Submission> = mutableSetOf()
 ) : LazyFetchable {
 	override fun toFetch() = listOf(owner, contest, members, submissions)
+
+	companion object {
+		const val ENTITY_NAME = "Team"
+	}
 }

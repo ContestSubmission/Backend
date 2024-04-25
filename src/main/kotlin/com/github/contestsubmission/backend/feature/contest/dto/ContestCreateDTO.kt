@@ -15,7 +15,7 @@ data class ContestCreateDTO(
 	val name: String,
 	val description: String?,
 	@field:Future
-	@field:Schema(example = "2025-05-10T00:00:00")
+	@field:Schema(example = "2025-05-10T10:00:00.000Z")
 	val deadline: Instant,
 	@field:Min(1)
 	@field:Max(50)

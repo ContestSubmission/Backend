@@ -10,6 +10,7 @@ import java.util.*
 
 @ApplicationScoped
 class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
+	override val entityName = Contest.ENTITY_NAME
 
 	fun search(term: String): MutableList<Contest>? =
 		entityManager.createQuery(
@@ -56,7 +57,7 @@ class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
 
 	// cast from MutableList -> List
 	@Suppress("UNCHECKED_CAST", "kotlin:S6531")
-	fun getPersonalContest(caller: Person, contestId: UUID): PersonalContestDTO? {
+	fun getPersonalContestOrNull(caller: Person, contestId: UUID): PersonalContestDTO? {
 		val personalContestDTO = entityManager.createQuery(
 			"""
 				SELECT NEW com.github.contestsubmission.backend.feature.contest.dto.PersonalContestDTO(

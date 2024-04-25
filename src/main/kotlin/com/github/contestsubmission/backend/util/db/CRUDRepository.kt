@@ -27,7 +27,9 @@ abstract class CRUDRepository<T : Any, I>(val entityClass: Class<T>) {
 		return entity
 	}
 
-	open fun findById(id: I): T? = entityManager.find(entityClass, id)
+	abstract val entityName: String
+
+	open fun findByIdOrNull(id: I): T? = entityManager.find(entityClass, id)
 }
 
 /**

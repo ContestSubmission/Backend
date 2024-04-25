@@ -27,20 +27,16 @@ class GradeResourceTest {
 	) = GradeResource().apply {
 		contestId = contestUUID
 		userAuthenticationService = object : UserAuthenticationService() {
-			override fun getUser(): Person {
-				return user
-			}
+			override fun getUserOrNull() = user
 		}
 		contestRepository = object : ContestRepository() {
-			override fun findById(id: UUID): Contest {
-				return Contest(
-					id = contestUUID,
-					name = "My contest",
-					organizer = organizerPerson,
-					deadline = deadline,
-					publicGrading = publicGrading
-				)
-			}
+			override fun findByIdOrNull(id: UUID) = Contest(
+				id = contestUUID,
+				name = "My contest",
+				organizer = organizerPerson,
+				deadline = deadline,
+				publicGrading = publicGrading
+			)
 		}
 		gradeRepository = object : GradeRepository() {
 			override fun getByContest(contestId: UUID, personId: UUID?): List<GradeTeamOverviewDTO> {
