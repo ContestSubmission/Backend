@@ -63,7 +63,7 @@ dependencies {
 }
 
 group = "com.github.contestsubmission.backend"
-version = "4.1.0"
+version = "4.2.0"
 
 buildInfo {
 	this.gitInfoMode = BuildInfoExtension.MODE_ERROR
@@ -82,7 +82,7 @@ tasks.register("copyBuildInfoToJar", Copy::class) {
 	into("build/resources/main")
 }
 
-listOf(tasks.jar, tasks.quarkusDependenciesBuild, tasks.quarkusDev, tasks.imageBuild)
+listOf(tasks.jar, tasks.quarkusDependenciesBuild, tasks.quarkusDev, tasks.imageBuild, tasks.test)
 	.map(TaskProvider<out Task>::get)
 	.forEach {
 		it.dependsOn(tasks.getByName("copyBuildInfoToJar"))

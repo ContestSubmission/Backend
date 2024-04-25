@@ -55,7 +55,7 @@ class SubmissionResource {
 	@GET
 	@Authenticated
 	@Produces(MediaType.APPLICATION_JSON)
-	fun create(@QueryParam("fileName") @NotNull @NotBlank fileName: String): PreSignedPost? {
+	fun create(@QueryParam("fileName") @NotNull @NotBlank fileName: String, @QueryParam("contentType") @NotNull @NotBlank contentType: String): PreSignedPost? {
 		val user = userAuthenticationService.getUser() ?: throw UnauthorizedException("You are not logged in!")
 		val team = userAuthenticationService.getTeam(teamId, contestId)
 
@@ -75,6 +75,7 @@ class SubmissionResource {
 				)
 			)
 			.withContentLengthRange(1, MAX_FILE_SIZE) // file size upload limit in bytes
+			.withContentType(contentType)
 			.build()
 		val conditions = S3PostSigner.sign(postParams).conditions
 
@@ -84,6 +85,7 @@ class SubmissionResource {
 			claim("team", team.id.toString())
 			claim("uploadUrl", "$baseUrl/$fullFileName")
 			claim("fileName", fileName)
+			claim("contentType", contentType)
 			expiresIn(1.hours)
 		}.sign()
 
@@ -134,10 +136,12 @@ class SubmissionResource {
 
 		val now = Instant.now(systemUTC())
 		val fileName = jwt.claim<String>("fileName").orElseThrow { BadRequestException("Invalid fileName") }
+		val contentType = jwt.claim<String>("contentType").orElseThrow { BadRequestException("Invalid contentType") }
 
 		val submission = handInSubmissionDTO.toEntity().apply {
 			this.url = passedURL.toExternalForm()
 			this.fileName = fileName
+			this.contentType = contentType
 			this.team = team
 			this.handedInAt = now
 			this.uploadedBy = user

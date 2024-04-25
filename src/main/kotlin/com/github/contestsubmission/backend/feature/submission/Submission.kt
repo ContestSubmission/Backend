@@ -18,8 +18,10 @@ class Submission {
 	@ManyToOne
 	var team: Team? = null
 	var handedInAt: Instant = Instant.now()
+	@Column(name = "content_type")
+	var contentType: String? = null
 
 	override fun toString(): String {
-		return "Submission(id=$id, url=$url, fileName=$fileName, uploadedBy=$uploadedBy, team=$team, handedInAt=$handedInAt)"
+		return "Submission(id=$id, url=$url, fileName=$fileName, uploadedBy=$uploadedBy, team=$team, handedInAt=$handedInAt, contentType=$contentType)"
 	}
 }
