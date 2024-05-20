@@ -15,6 +15,7 @@ data class PersonalContestDTO(
 	val publicGrading: Boolean,
 	override val deadline: Instant,
 	val maxTeamSize: Int,
+	val defaultViewMode: String,
 	@JsonIgnoreProperties("contest")
 	val team: Team?
 ) : ContestDTO {

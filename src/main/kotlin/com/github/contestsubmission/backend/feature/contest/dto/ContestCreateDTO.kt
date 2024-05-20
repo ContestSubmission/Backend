@@ -21,6 +21,7 @@ data class ContestCreateDTO(
 	@field:Max(50)
 	@field:Schema(example = "5")
 	val maxTeamSize: Int,
+	val defaultViewMode: String = "table",
 	val publicAccessible: Boolean,
 	val publicGrading: Boolean
 ) : ToEntityDTO<Contest> {
@@ -29,6 +30,7 @@ data class ContestCreateDTO(
 		description = description,
 		deadline = deadline,
 		maxTeamSize = maxTeamSize,
+		defaultViewMode = defaultViewMode,
 		publicAccessible = publicAccessible,
 		publicGrading = publicGrading
 	)

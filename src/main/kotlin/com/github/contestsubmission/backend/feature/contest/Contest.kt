@@ -27,6 +27,8 @@ class Contest(
 	var publicGrading: Boolean = false,
 	override var deadline: Instant = Instant.now().plus(7, ChronoUnit.DAYS),
 	var maxTeamSize: Int = 1,
+	// e.g. "table" or "grid" - type unsafe, to be handled entirely by the frontend
+	var defaultViewMode: String = "table",
 	@OneToMany(mappedBy = "contest", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
 	@JsonIgnoreProperties("contest")
 	var teams: MutableList<Team>? = mutableListOf()

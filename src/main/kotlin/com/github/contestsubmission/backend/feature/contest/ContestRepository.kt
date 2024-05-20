@@ -68,6 +68,7 @@ class ContestRepository : CRUDRepository<Contest, UUID>(Contest::class) {
 					c.publicGrading,
 					c.deadline,
 					c.maxTeamSize,
+					c.defaultViewMode,
 					t
 				)
 				FROM Contest c

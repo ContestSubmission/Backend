@@ -15,5 +15,5 @@ generator_cli_jar="openapi-generator-cli.jar"
 # download if not present
 [ ! -f "$generator_cli_jar" ] && wget https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/7.2.0/openapi-generator-cli-7.2.0.jar -O "$generator_cli_jar"
 
-(cd "$repo_root" && ./gradlew build)
+(cd "$repo_root" && ./gradlew build -x check)
 java -jar "$generator_cli_jar" generate -i "$repo_root/build/openapi/openapi.yaml" -g typescript-fetch -o "$api_client_root" --additional-properties=typescriptThreePlus=true

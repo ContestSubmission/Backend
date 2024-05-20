@@ -1,0 +1,2 @@
+ALTER TABLE contest
+ADD COLUMN defaultViewMode VARCHAR(255) DEFAULT 'table' NOT NULL;
