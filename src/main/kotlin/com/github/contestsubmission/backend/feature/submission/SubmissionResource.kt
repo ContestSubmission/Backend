@@ -1,6 +1,8 @@
 package com.github.contestsubmission.backend.feature.submission
 
 import com.github.contestsubmission.backend.feature.submission.dto.HandInSubmissionDTO
+import com.github.contestsubmission.backend.feature.team.Team
+import com.github.contestsubmission.backend.feature.user.Person
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
 import com.github.contestsubmission.backend.util.expiresIn
 import com.github.contestsubmission.backend.util.toUUID
@@ -11,14 +13,17 @@ import io.github.dyegosutil.awspresignedpost.signer.S3PostSigner
 import io.quarkus.security.Authenticated
 import io.smallrye.jwt.auth.principal.JWTParser
 import io.smallrye.jwt.build.Jwt
+import io.smallrye.jwt.build.JwtClaimsBuilder
 import jakarta.inject.Inject
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import org.eclipse.microprofile.config.inject.ConfigProperty
+import org.eclipse.microprofile.jwt.JsonWebToken
 import software.amazon.awssdk.regions.Region
 import java.net.URI
+import java.net.URL
 import java.time.Clock.systemUTC
 import java.time.Instant
 import java.time.ZoneOffset.UTC
@@ -80,16 +85,25 @@ class SubmissionResource {
 		val conditions = S3PostSigner.sign(postParams).conditions
 
 		val baseUrl = "$endpointOverride/$bucket"
-		val jwt = Jwt.claims().apply {
-			subject(user.id.toString())
-			claim("team", team.id.toString())
-			claim("uploadUrl", "$baseUrl/$fullFileName")
-			claim("fileName", fileName)
-			claim("contentType", contentType)
-			expiresIn(1.hours)
-		}.sign()
+		val jwt = buildJwt(user, team, baseUrl, fullFileName, fileName, contentType)
 
-		return PreSignedPost(baseUrl, conditions, jwt)
+		return PreSignedPost(baseUrl, conditions, jwt.sign())
+	}
+
+	internal fun buildJwt(
+		user: Person,
+		team: Team,
+		baseUrl: String,
+		fullFileName: String,
+		fileName: String,
+		contentType: String
+	): JwtClaimsBuilder = Jwt.claims().apply {
+		subject(user.id.toString())
+		claim("team", team.id.toString())
+		claim("uploadUrl", "$baseUrl/$fullFileName")
+		claim("fileName", fileName)
+		claim("contentType", contentType)
+		expiresIn(1.hours)
 	}
 
 	@Inject
@@ -98,6 +112,7 @@ class SubmissionResource {
 	@Inject
 	lateinit var submissionRepository: SubmissionRepository
 
+	@Suppress("DEPRECATION")
 	@Path("submit")
 	@POST
 	@Authenticated
@@ -107,13 +122,13 @@ class SubmissionResource {
 		val user = userAuthenticationService.getUser()
 		val team = userAuthenticationService.getTeam(teamId, contestId)
 
-		val jwt = try {
+		val jwt: JsonWebToken? = try {
 			jwtParser.parse(handInSubmissionDTO.jwt)
 		} catch (e: Exception) {
-			throw BadRequestException("Illegal request - invalid JWT: ${e.message}")
+			throw BadRequestException("Illegal request - invalid JWT: ${e.message}", e)
 		}
 
-		val userId = jwt.subject?.toUUID() ?: throw BadRequestException("Invalid subject")
+		val userId = jwt?.subject?.toUUID() ?: throw BadRequestException("Invalid subject")
 		if (userId != user.id) {
 			throw BadRequestException("Illegal request - mismatched user")
 		}
@@ -123,8 +138,10 @@ class SubmissionResource {
 		}
 
 		val uploadUrl = jwt.claim<String>("uploadUrl").orElseThrow { BadRequestException("Illegal request - invalid uploadUrl") }
-		val passedURL = URI(handInSubmissionDTO.url).toURL()
-		val uploadedURL = URI(uploadUrl).toURL()
+		// do NOT replace the URL constructor with `URI` or file uploads with spaces will fail
+		// see `SubmissionResourceTest` and https://github.com/ContestSubmission/Backend/issues/21
+		val passedURL = URL(handInSubmissionDTO.url)
+		val uploadedURL = URL(uploadUrl)
 		val endpoint = URI(endpointOverride).toURL()
 		if (passedURL.file != uploadedURL.file || passedURL.host != endpoint.host || passedURL.port != endpoint.port) {
 			throw BadRequestException("Illegal request - mismatched file name or host. passedURL: $passedURL, uploadedURL: $uploadedURL, endpoint: $endpoint")

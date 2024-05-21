@@ -57,13 +57,14 @@ dependencies {
 	quarkusDev("io.quarkiverse.mailpit:quarkus-mailpit:0.0.9")
 
 	testImplementation("io.quarkus:quarkus-junit5")
+	testImplementation("io.quarkus:quarkus-junit5-mockito")
 	testImplementation("io.rest-assured:rest-assured")
 
 	quarkusDev("org.jetbrains.kotlin:kotlin-allopen-compiler-plugin")
 }
 
 group = "com.github.contestsubmission.backend"
-version = "4.3.0"
+version = "4.3.1"
 
 buildInfo {
 	this.gitInfoMode = BuildInfoExtension.MODE_ERROR
