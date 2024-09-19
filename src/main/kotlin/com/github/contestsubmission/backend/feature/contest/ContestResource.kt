@@ -1,14 +1,16 @@
 package com.github.contestsubmission.backend.feature.contest
 
 import com.github.contestsubmission.backend.feature.contest.dto.ContestCreateDTO
+import com.github.contestsubmission.backend.feature.contest.dto.ContestUpdateDTO
 import com.github.contestsubmission.backend.feature.contest.dto.ParticipatedContestDTO
 import com.github.contestsubmission.backend.feature.contest.dto.PersonalContestDTO
 import com.github.contestsubmission.backend.feature.user.UserAuthenticationService
 import com.github.contestsubmission.backend.util.db.findByIdFullFetch
+import com.github.contestsubmission.backend.util.entityNotFound
 import com.github.contestsubmission.backend.util.findById
+import com.github.contestsubmission.backend.util.getPersonalContest
 import com.github.contestsubmission.backend.util.rest.UriBuildable
 import com.github.contestsubmission.backend.util.rest.response
-import com.github.contestsubmission.backend.util.getPersonalContest
 import getUser
 import io.quarkus.security.Authenticated
 import io.quarkus.security.UnauthorizedException
@@ -71,6 +73,30 @@ class ContestResource : UriBuildable {
 		)]
 	)
 	fun getContest(@Valid id: UUID) = contestRepository.findByIdFullFetch(id).response()
+
+	@PUT
+	@Path("/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@APIResponse(responseCode = "404", description = "Contest not found")
+	@APIResponse(responseCode = "204", description = "Contest updated")
+	fun updateContest(@Valid id: UUID, updateDTO: ContestUpdateDTO): Response {
+		val caller = userAuthenticationService.getUser()
+		val contest = contestRepository.findByIdFullFetch(id)
+			?: throw NotFoundException(entityNotFound(Contest.ENTITY_NAME))
+
+		if (contest.organizer != caller) {
+			throw UnauthorizedException("You are not the organizer of this contest")
+		}
+
+		if (contest.hasEnded() && updateDTO.deadline != null) {
+			throw UnauthorizedException("You cannot change the deadline of a contest that has ended")
+		}
+
+		updateDTO.applyToEntity(contest)
+		contestRepository.merge(contest)
+
+		return Response.status(Response.Status.NO_CONTENT).build()
+	}
 
 	@GET
 	@Path("/{id}/personal")
